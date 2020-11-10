@@ -43,7 +43,7 @@ Instructions for deploying the Chainsource Gateway using helm charts can be foun
 
 If you have any queries on chainsource-gateway, feel free to reach us on any of our [communication channels](https://github.com/DBOMproject/community/blob/master/COMMUNICATION.md) 
 
-If you have questions, concerns, bug reports, etc, please file an issue in this repository's [issue tracker](https://github.com/DBOMproject/node-sdk/issues).
+If you have questions, concerns, bug reports, etc, please file an issue in this repository's [issue tracker](https://github.com/DBOMproject/chainsource-gateway/issues).
 
 ## Getting Involved
 
