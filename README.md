@@ -9,8 +9,8 @@ The gateway component for the Digital Bill of Materials
   - [API](#api)
   - [Configuration](#configuration)
 - [Helm Deployment](#helm-deployment)
-- [Jenkins Pipeline](#jenkins-pipeline)
-- [WSO2](#wso2)
+- [Getting Help](#getting-help)
+- [Getting Involved](#getting-involved)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -39,13 +39,13 @@ Configure `agent-config.yaml` with the details of your agent(s)
 
 Instructions for deploying the Chainsource Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployment/blob/master/charts/chainsource-gateway)
 
-## Getting help
+## Getting Help
 
 If you have any queries on insert-project-name, feel free to reach us on any of our [communication channels](https://github.com/DBOMproject/community/blob/master/COMMUNICATION.md) 
 
 If you have questions, concerns, bug reports, etc, please file an issue in this repository's [issue tracker](https://github.com/DBOMproject/node-sdk/issues).
 
-## Getting involved
+## Getting Involved
 
 This section should detail why people should get involved and describe key areas you are
 currently focusing on; e.g., trying to get feedback on features, fixing certain bugs, building
