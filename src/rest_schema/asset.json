@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "required": [
+    "standardVersion",
+    "documentName",
+    "documentCreator",
+    "documentCreatedDate",
+    "assetType",
+    "assetSubType",
+    "assetManufacturer",
+    "assetModelNumber",
+    "assetDescription",
+    "assetMetadata",
+    "manufactureSignature"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "standardVersion": {
+      "$id": "#/properties/standardVersion",
+      "type": "number",
+      "default": 1
+    },
+    "documentName": {
+      "$id": "#/properties/documentName",
+      "type": "string",
+      "minLength": 1
+    },
+    "documentCreator": {
+      "$id": "#/properties/documentCreator",
+      "type": "string",
+      "minLength": 1
+    },
+    "documentCreatedDate": {
+      "$id": "#/properties/documentCreatedDate",
+      "type": "string",
+      "minLength": 1
+    },
+    "assetType": {
+      "$id": "#/properties/assetType",
+      "type": "string",
+      "minLength": 1
+    },
+    "assetSubType": {
+      "$id": "#/properties/assetSubType",
+      "type": "string",
+      "minLength": 1
+    },
+    "assetManufacturer": {
+      "$id": "#/properties/assetManufacturer",
+      "type": "string",
+      "minLength": 1
+    },
+    "assetModelNumber": {
+      "$id": "#/properties/assetModelNumber",
+      "type": "string",
+      "minLength": 1
+    },
+    "assetDescription": {
+      "$id": "#/properties/assetDescription",
+      "type": "string",
+      "minLength": 1
+    },
+    "assetMetadata": {
+      "$id": "#/properties/assetMetadata",
+      "type": "object",
+      "default": {}
+    },
+    "parentAsset":{
+      "$id": "#/properties/parentAsset",
+      "type": "object",
+      "default": {}
+    },
+    "attachedChildren": {
+      "$id": "#/properties/attachedChildren",
+      "type": "array",
+      "default": [],
+      "items": {
+        "$id": "#/properties/attachedChildren/items",
+        "type": "object",
+        "default": {},
+        "required": [
+          "role",
+          "subRole",
+          "repoID",
+          "channelID",
+          "assetID"
+        ],
+        "properties": {
+          "role": {
+            "$id": "#/properties/attachedChildren/items/properties/role",
+            "type": "string",
+            "default": ""
+          },
+          "subRole": {
+            "$id": "#/properties/attachedChildren/items/properties/subRole",
+            "type": "string",
+            "default": ""
+          },
+          "repoID": {
+            "$id": "#/properties/attachedChildren/items/properties/repoID",
+            "type": "string",
+            "default": ""
+          },
+          "channelID": {
+            "$id": "#/properties/attachedChildren/items/properties/channelID",
+            "type": "string",
+            "default": ""
+          },
+          "assetID": {
+            "$id": "#/properties/attachedChildren/items/properties/assetID",
+            "type": "string",
+            "default": ""
+          }
+        }
+      }
+    },
+    "manufactureSignature": {
+      "$id": "#/properties/manufactureSignature",
+      "type": "string",
+      "default": ""
+    }
+  }
+}

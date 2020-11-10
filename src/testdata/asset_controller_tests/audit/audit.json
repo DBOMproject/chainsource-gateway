@@ -1,0 +1,72 @@
+{
+  "history": [
+    {
+      "_id": "5f33e142916c76c9dd96c266",
+      "channelID": "C2",
+      "eventType": "CREATE",
+      "payload": {
+        "assetDescription": "Core i5 3500k Desktop Processor",
+        "assetManufacturer": "Intel Corporation",
+        "assetMetadata": {
+          "clockSpeed": "3.4Ghz",
+          "cpuSocket": "LGA 1151",
+          "packageWattage": "65",
+          "packageWeight": "340g",
+          "physicalCoreCount": "4",
+          "supportedMemoryType": "DDR4SDRAM"
+        },
+        "assetModelNumber": "BX80677I57500",
+        "assetSubType": "CPUUnit",
+        "assetType": "HardwareComponent",
+        "documentCreatedDate": "2020-07-30T06:31:58+0000",
+        "documentCreator": "Intel FAB California",
+        "documentName": "BoM for CPU Core i5 3500k",
+        "manufactureSignature": "wsBcBAEBCAAQBQJecxBBCRDhB93OjBXccAAAlAQH/0N2HhaK6fmADG0QxK9i8xIrgncGzvii6OqPzyVtyjA7RrpgA1c5E5wN5eW8XmPaqpMvtP3RenuTlXTH2d647QnzdxYuNOKjVXGuweBMkBqnKBf8hHeH6adBTh6Jlnbt3OndMsE06BMBz59Z/X4tmKoAWXox1EPraAi9+A6BqeB5YHXDQJ6SXsW9fLKoQVECsi0MHOR+CjGcu1R1dyP5s2Vd9jcm+DLXLmxz6zTqS7h1neLMsFm4jIhxYsh5mQ49R4r6Yi76RIMK5G6LxX32BzKb9rTDSKdqRFQAv4JsoZXTPRwlM3MG/FCQWYhtvc6righlAMJOVSXTxy54TPKeXe4==SVL1",
+        "parentAsset": {
+          "assetID": "",
+          "channelID": "",
+          "repoID": "",
+          "role": "",
+          "subRole": ""
+        },
+        "standardVersion": 1
+      },
+      "resourceID": "AssetOnC2",
+      "timestamp": "2020-08-12T12:32:02.372Z"
+    },
+    {
+      "_id": "5f33e1a6916c761d0c96c268",
+      "channelID": "C2",
+      "eventType": "ATTACH",
+      "payload": {
+        "assetDescription": "Core i5 3500k Desktop Processor",
+        "assetManufacturer": "Intel Corporation",
+        "assetMetadata": {
+          "clockSpeed": "3.4Ghz",
+          "cpuSocket": "LGA 1151",
+          "packageWattage": "65",
+          "packageWeight": "340g",
+          "physicalCoreCount": "4",
+          "supportedMemoryType": "DDR4SDRAM"
+        },
+        "assetModelNumber": "BX80677I57500",
+        "assetSubType": "CPUUnit",
+        "assetType": "HardwareComponent",
+        "documentCreatedDate": "2020-07-30T06:31:58+0000",
+        "documentCreator": "Intel FAB California",
+        "documentName": "BoM for CPU Core i5 3500k",
+        "manufactureSignature": "wsBcBAEBCAAQBQJecxBBCRDhB93OjBXccAAAlAQH/0N2HhaK6fmADG0QxK9i8xIrgncGzvii6OqPzyVtyjA7RrpgA1c5E5wN5eW8XmPaqpMvtP3RenuTlXTH2d647QnzdxYuNOKjVXGuweBMkBqnKBf8hHeH6adBTh6Jlnbt3OndMsE06BMBz59Z/X4tmKoAWXox1EPraAi9+A6BqeB5YHXDQJ6SXsW9fLKoQVECsi0MHOR+CjGcu1R1dyP5s2Vd9jcm+DLXLmxz6zTqS7h1neLMsFm4jIhxYsh5mQ49R4r6Yi76RIMK5G6LxX32BzKb9rTDSKdqRFQAv4JsoZXTPRwlM3MG/FCQWYhtvc6righlAMJOVSXTxy54TPKeXe4==SVL1",
+        "parentAsset": {
+          "assetID": "AssetOnC1",
+          "channelID": "C1",
+          "repoID": "DB1",
+          "role": "InternalMemory",
+          "subRole": "L3Cache"
+        },
+        "standardVersion": 1
+      },
+      "resourceID": "AssetOnC2",
+      "timestamp": "2020-08-12T12:33:42.509Z"
+    }
+  ]
+}

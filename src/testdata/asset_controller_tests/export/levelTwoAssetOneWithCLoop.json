@@ -1,0 +1,42 @@
+{
+  "standardVersion": 1.0,
+  "documentName": "L2A1",
+  "documentCreator": "A Valid Creator",
+  "documentCreatedDate": "2020-07-30T06:31:58+0000",
+  "assetType": "HardwareComponent",
+  "assetSubType": "AValidSubType",
+  "assetManufacturer": "A Valid Manufacturer",
+  "assetModelNumber": "A Valid ModelNumber",
+  "assetDescription": "A Valid Description",
+  "parentAsset": {
+    "repoID": "T1",
+    "channelID": "C1",
+    "assetID": "A1",
+    "role": "A_Role",
+    "subRole": "A_SubRole"
+  },
+  "attachedChildren": [
+    {
+      "role": "A_Role",
+      "subRole": "A_SubRole",
+      "repoID": "T1",
+      "channelID": "C1",
+      "assetID": "A1"
+    }
+  ],
+  "assetMetadata": {
+    "iAmNested": {
+      "I_am_a_long_key_thats_nested": {
+        "SecondLevelNestedKey": "SecondLevelNestedValue",
+        "AnotherKey": "AnotherValue",
+        "NestingAndValues": {
+          "CombinationOfBoth": "TestValue"
+        }
+      },
+      "YetAnotherKey": {
+        "YetAnotherNestedKey": "YetAnotherNestedValue"
+      }
+    }
+  },
+  "manufactureSignature": "wsBcBAEBCAAQBQJecxBBCRDhB93OjBXccAAAlAQH/0N2HhaK6fmADG0QxK9i8xIrgncGzvii6OqPzyVtyjA7RrpgA1c5E5wN5eW8XmPaqpMvtP3RenuTlXTH2d647QnzdxYuNOKjVXGuweBMkBqnKBf8hHeH6adBTh6Jlnbt3OndMsE06BMBz59Z/X4tmKoAWXox1EPraAi9+A6BqeB5YHXDQJ6SXsW9fLKoQVECsi0MHOR+CjGcu1R1dyP5s2Vd9jcm+DLXLmxz6zTqS7h1neLMsFm4jIhxYsh5mQ49R4r6Yi76RIMK5G6LxX32BzKb9rTDSKdqRFQAv4JsoZXTPRwlM3MG/FCQWYhtvc6righlAMJOVSXTxy54TPKeXe4==SVL1"
+}

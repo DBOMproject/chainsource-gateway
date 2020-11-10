@@ -1,0 +1,27 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "required": [
+    "repoID",
+    "channelID",
+    "assetID"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "transferDescription": {
+      "type": "string"
+    },
+    "repoID": {
+      "type": "string",
+      "minLength": 1
+    },
+    "channelID": {
+      "type": "string",
+      "minLength": 1
+    },
+    "assetID": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
