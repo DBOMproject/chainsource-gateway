@@ -18,7 +18,7 @@ The gateway component for the Digital Bill of Materials
 
 ### API
 
-Latest OpenAPI Specifications and Postman Collection Files for this API is available on the [api-specs repository](https://github.com/DBOMproject/deployment/blob/master/api-specs/gateway)
+Latest OpenAPI Specifications and Postman Collection Files for this API is available on the [api-specs repository](https://github.com/DBOMproject/api-specs/tree/master/gateway)
 
 ### Configuration
 
@@ -37,7 +37,7 @@ Configure `agent-config.yaml` with the details of your agent(s)
 
 ## Helm Deployment
 
-Instructions for deploying the Chainsource Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployment/blob/master/charts/chainsource-gateway)
+Instructions for deploying the Chainsource Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/chainsource-gateway)
 
 ## Getting Help
 
