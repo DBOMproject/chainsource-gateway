@@ -1,3 +1,8 @@
+![docker-ci](https://github.com/DBOMproject/chainsource-gateway/workflows/docker-ci/badge.svg)
+![GitHub](https://img.shields.io/github/license/dbomproject/chainsource-gateway)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/dbomproject/chainsource-gateway)
+![Docker Pulls](https://img.shields.io/docker/pulls/dbomproject/chainsource-gateway)
+
 # Chainsource Gateway
 The gateway component for the Digital Bill of Materials
 
