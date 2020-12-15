@@ -4,7 +4,6 @@ COPY src /build/src
 COPY config /build/config
 WORKDIR /build/src
 ENV GO111MODULE=on
-RUN go test -v -cover ./...
 RUN CGO_ENABLED=0 GOOS=linux go build -o Gateway
 
 # Package only executable
