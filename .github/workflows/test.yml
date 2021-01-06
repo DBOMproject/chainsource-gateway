@@ -15,6 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Test
+      working-directory: ./src
       run: go test -v ./...
   coverage:
     runs-on: ubuntu-latest
@@ -27,6 +28,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Calculate Code Coverage
+      working-directory: ./src
       run: |
         go test -v ./... -covermode=count -coverprofile=coverage.out
     - name: Convert coverage.out to coverage.lcov
