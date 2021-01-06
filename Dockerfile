@@ -1,5 +1,5 @@
 # CI Build
-FROM golang:1.14.3-stretch as builder
+FROM golang:1.15-alpine as builder
 COPY src /build/src
 COPY config /build/config
 WORKDIR /build/src
