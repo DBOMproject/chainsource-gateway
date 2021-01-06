@@ -2,21 +2,26 @@ on: [push, pull_request]
 name: Test
 jobs:
   test:
+    env: 
+      working-directory: ./src
+      go-version:  1.15 
     runs-on: ubuntu-latest
     steps:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ matrix.go-version }}
+        go-version: ${{ env.go-version }}
     - name: Checkout code
       uses: actions/checkout@v2
     - name: Test and Create Coverage Data
-      working-directory: ./src
-      run: go test -v ./... -covermode=count -coverprofile=../coverage.out
+      working-directory: ${{ env.working-directory }}
+      run: go test -v ./... -covermode=count -coverprofile=coverage.out
     - name: Convert coverage.out to coverage.lcov
       uses: jandelgado/gcov2lcov-action@v1.0.6
+      with:
+        working-directory: ${{ env.working-directory }}
     - name: Coveralls
       uses: coverallsapp/github-action@v1.1.2
       with:
           github-token: ${{ secrets.github_token }}
-          path-to-lcov: coverage.lcov
+          path-to-lcov: ${{ env.working-directory }}/coverage.lcov
