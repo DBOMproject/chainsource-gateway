@@ -2,6 +2,7 @@
 ![GitHub](https://img.shields.io/github/license/dbomproject/chainsource-gateway)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/dbomproject/chainsource-gateway)
 ![Docker Pulls](https://img.shields.io/docker/pulls/dbomproject/chainsource-gateway)
+[![Coverage Status](https://coveralls.io/repos/github/DBOMproject/chainsource-gateway/badge.svg?branch=master)](https://coveralls.io/github/DBOMproject/chainsource-gateway?branch=master)
 
 # Chainsource Gateway
 The gateway component for the Digital Bill of Materials
