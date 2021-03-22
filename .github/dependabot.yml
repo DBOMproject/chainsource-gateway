@@ -1,0 +1,14 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod" 
+    directory: "src/"
+    reviewers: 
+      - "DBOMproject/Unisys-Technical"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "docker"
+    directory: "/"
+    reviewers: 
+      - "DBOMproject/Unisys-Technical"
+    schedule:
+      interval: "daily"
