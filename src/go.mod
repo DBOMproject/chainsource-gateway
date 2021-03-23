@@ -7,9 +7,9 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-chi/render v1.0.1
-	github.com/golang/mock v1.4.3
+	github.com/golang/mock v1.5.0
 	github.com/magiconair/properties v1.8.1
-	github.com/opentracing/opentracing-go v1.1.0
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/qri-io/jsonschema v0.1.1
 	github.com/rs/zerolog v1.18.0
 	github.com/spf13/viper v1.6.2
