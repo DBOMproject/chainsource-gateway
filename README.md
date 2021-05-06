@@ -45,6 +45,10 @@ Configure `agent-config.yaml` with the details of your agent(s)
 
 Instructions for deploying the Chainsource Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/chainsource-gateway)
 
+## Platform Support
+
+Currently, we provide pre-built container images for linux amd64 and arm64 architectures via our Github Actions Pipeline. Find the images [here](https://hub.docker.com/r/dbomproject/chainsource-gateway)
+
 ## Getting Help
 
 If you have any queries on chainsource-gateway, feel free to reach us on any of our [communication channels](https://github.com/DBOMproject/community/blob/master/COMMUNICATION.md) 
