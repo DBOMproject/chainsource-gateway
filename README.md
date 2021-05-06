@@ -15,6 +15,7 @@ The gateway component for the Digital Bill of Materials
   - [API](#api)
   - [Configuration](#configuration)
 - [Helm Deployment](#helm-deployment)
+- [Platform Support](#platform-support)
 - [Getting Help](#getting-help)
 - [Getting Involved](#getting-involved)
 
