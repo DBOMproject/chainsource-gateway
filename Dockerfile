@@ -1,5 +1,5 @@
 # CI Build
-FROM golang:1.16.3-alpine as builder
+FROM golang:1.16.4-alpine as builder
 COPY src /build/src
 COPY config /build/config
 WORKDIR /build/src
