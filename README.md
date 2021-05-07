@@ -15,6 +15,7 @@ The gateway component for the Digital Bill of Materials
   - [API](#api)
   - [Configuration](#configuration)
 - [Helm Deployment](#helm-deployment)
+- [Platform Support](#platform-support)
 - [Getting Help](#getting-help)
 - [Getting Involved](#getting-involved)
 
@@ -44,6 +45,10 @@ Configure `agent-config.yaml` with the details of your agent(s)
 ## Helm Deployment
 
 Instructions for deploying the Chainsource Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/chainsource-gateway)
+
+## Platform Support
+
+Currently, we provide pre-built container images for linux amd64 and arm64 architectures via our Github Actions Pipeline. Find the images [here](https://hub.docker.com/r/dbomproject/chainsource-gateway)
 
 ## Getting Help
 
