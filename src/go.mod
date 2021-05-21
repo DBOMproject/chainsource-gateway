@@ -14,7 +14,7 @@ require (
 	github.com/rs/zerolog v1.18.0
 	github.com/spf13/viper v1.6.2
 	github.com/stretchr/testify v1.3.0
-	github.com/uber/jaeger-client-go v2.24.0+incompatible
+	github.com/uber/jaeger-client-go v2.29.0+incompatible
 	github.com/uber/jaeger-lib v2.2.0+incompatible
 	gopkg.in/h2non/gock.v1 v1.0.15
 	gopkg.in/yaml.v2 v2.2.8 // indirect
