@@ -12,10 +12,9 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/qri-io/jsonschema v0.1.1
 	github.com/rs/zerolog v1.18.0
-	github.com/spf13/viper v1.6.2
+	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.24.0+incompatible
 	github.com/uber/jaeger-lib v2.2.0+incompatible
 	gopkg.in/h2non/gock.v1 v1.0.15
-	gopkg.in/yaml.v2 v2.2.8 // indirect
 )
