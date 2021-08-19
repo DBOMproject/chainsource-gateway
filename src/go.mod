@@ -3,7 +3,7 @@ module chainsource-gateway
 go 1.14
 
 require (
-	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
+	github.com/HdrHistogram/hdrhistogram-go v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/go-chi/chi v4.0.3+incompatible
 	github.com/go-chi/render v1.0.1
@@ -15,6 +15,6 @@ require (
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.24.0+incompatible
-	github.com/uber/jaeger-lib v2.2.0+incompatible
+	github.com/uber/jaeger-lib v2.4.1+incompatible
 	gopkg.in/h2non/gock.v1 v1.0.15
 )
