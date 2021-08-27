@@ -19,6 +19,7 @@ package mocks
 
 import (
 	"chainsource-gateway/agent"
+
 	"github.com/golang/mock/gomock"
 )
 
@@ -41,10 +42,28 @@ func AgentQueryFor(channelID string, assetID string) gomock.Matcher {
 	return &queryArgsMatcher{channelID: channelID, assetID: assetID}
 }
 
+type richQueryArgsMatcher struct {
+	Query  interface{}
+	Filter interface{}
+	Skip   interface{}
+	Limit  interface{}
+}
+
+func (q *richQueryArgsMatcher) Matches(args interface{}) bool {
+	return true
+}
+
+func (q *richQueryArgsMatcher) String() string {
+	return "is a rich query"
+}
+
+func AgentRichQueryFor(Query interface{}, Filter interface{}, Skip interface{}, Limit interface{}) gomock.Matcher {
+	return &richQueryArgsMatcher{Query: Query, Filter: Filter, Skip: Skip, Limit: Limit}
+}
 
 type commitArgsMatcher struct {
-	channelID string
-	assetID   string
+	channelID  string
+	assetID    string
 	commitType string
 }
 
@@ -59,5 +78,5 @@ func (c *commitArgsMatcher) String() string {
 }
 
 func AgentCommitTo(channelID string, assetID string, commitType string) gomock.Matcher {
-	return &commitArgsMatcher{channelID: channelID, assetID: assetID, commitType:commitType}
+	return &commitArgsMatcher{channelID: channelID, assetID: assetID, commitType: commitType}
 }

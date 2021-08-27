@@ -45,7 +45,10 @@ var log = helpers.GetLogger("AssetRouter")
 func AssetRouter() (r chi.Router) {
 	r = chi.NewRouter()
 	r.Use(render.SetContentType(render.ContentTypeJSON))
+	r.Route("/repo/{repoID}", repoSubRouting)
+	r.Route("/repo/{repoID}/chan/{channelID}", channelSubRouting)
 	r.Route("/repo/{repoID}/chan/{channelID}/asset/{assetID}", assetSubRouting)
+	r.Route("/repo/{repoID}/chan/{channelID}/asset/_query", assetFunctionSubRouting)
 	return
 }
 
@@ -77,6 +80,21 @@ func assetSubRouting(r chi.Router) {
 		r.Get("/export", asset.ExportAsset)
 		r.Get("/export/{fileName}", asset.ExportAsset)
 	})
+}
+
+// assetFunctionSubRouting defines the sub routes for the asset function APIs
+func assetFunctionSubRouting(r chi.Router) {
+	r.Use(injectSpanMiddleware)
+	r.Use(agentProvider)
+	r.Use(signingServiceProvider)
+	r.Use(channelContext)
+	r.Use(queryContext)
+	r.Use(assetSchemaValidator)
+	r.Use(unmarshalBody)
+
+	// Base CRUD
+	r.Post("/", asset.QueryAsset)
+	r.Get("/", asset.QueryAsset)
 }
 
 // agentProvider injects an agent provider into the request context
@@ -155,6 +173,37 @@ func exportContext(next http.Handler) http.Handler {
 
 		log.Debug().Msgf("ctx: %+v ", vars)
 		ctx = context.WithValue(r.Context(), "exportVars", vars)
+
+		span.Finish()
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// queryContext parses the context for the query API
+func queryContext(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		span, ctx := opentracing.StartSpanFromContext(r.Context(), "Embedding Export Context")
+
+		var query interface{}
+		var filter []interface{}
+		var limit interface{}
+		var skip interface{}
+		json.Unmarshal([]byte(r.URL.Query().Get("query")), &query)
+		json.Unmarshal([]byte(r.URL.Query().Get("filter")), &filter)
+		json.Unmarshal([]byte(r.URL.Query().Get("limit")), &limit)
+		json.Unmarshal([]byte(r.URL.Query().Get("skip")), &skip)
+
+		// Append export file
+		vars := map[string]interface{}{
+			"query":  query,
+			"filter": filter,
+			"limit":  limit,
+			"skip":   skip,
+		}
+
+		log.Debug().Msgf("ctx: %+v ", vars)
+		ctx = context.WithValue(r.Context(), "assetQueryVars", vars)
 
 		span.Finish()
 		next.ServeHTTP(w, r.WithContext(ctx))

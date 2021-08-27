@@ -25,6 +25,9 @@ import (
 // Agent is an interface that is expected to be implemented by an agent
 type Agent interface {
 	Commit(ctx context.Context, args CommitArgs) (result map[string]interface{}, err error)
+	ListAssets(ctx context.Context, args QueryArgs) (resultStream io.ReadCloser, err error)
+	ListChannels(ctx context.Context, args QueryArgs) (resultStream io.ReadCloser, err error)
+	QueryAssets(ctx context.Context, args QueryArgs, body RichQueryArgs) (result map[string]interface{}, err error)
 	QueryStream(ctx context.Context, args QueryArgs) (resultStream io.ReadCloser, err error)
 	QueryAuditTrail(ctx context.Context, args QueryArgs) (result map[string]interface{}, err error)
 	GetHost() string
@@ -44,6 +47,3 @@ type Config struct {
 	RepoID  string
 	Enabled bool
 }
-
-
-

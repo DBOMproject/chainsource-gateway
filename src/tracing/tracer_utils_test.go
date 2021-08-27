@@ -18,11 +18,11 @@
 package tracing
 
 import (
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
-)
 
+	"github.com/stretchr/testify/assert"
+)
 
 // Test_getSamplerConfigFromEnv tests if the SamplerConfig can be successfully gotten from the env
 func Test_getSamplerConfigFromEnv(t *testing.T) {
@@ -32,7 +32,7 @@ func Test_getSamplerConfigFromEnv(t *testing.T) {
 		defer os.Unsetenv(jaegerSamplerParamVar)
 		defer os.Unsetenv(jaegerSamplerTypeVar)
 
-		_, err :=getSamplerConfigFromEnv()
+		_, err := getSamplerConfigFromEnv()
 		assert.NoError(t, err, "Retrieves without an error")
 	})
 	t.Run("When_Env_Vars_Set_Unparseable", func(t *testing.T) {
@@ -41,11 +41,11 @@ func Test_getSamplerConfigFromEnv(t *testing.T) {
 		defer os.Unsetenv(jaegerSamplerParamVar)
 		defer os.Unsetenv(jaegerSamplerTypeVar)
 
-		_, err :=getSamplerConfigFromEnv()
+		_, err := getSamplerConfigFromEnv()
 		assert.Error(t, err, "Error Raised")
 	})
 	t.Run("When_Env_Vars_Not_Set", func(t *testing.T) {
-		_, err :=getSamplerConfigFromEnv()
+		_, err := getSamplerConfigFromEnv()
 		assert.NoError(t, err, "Retrieves without an error")
 	})
 }
@@ -53,7 +53,7 @@ func Test_getSamplerConfigFromEnv(t *testing.T) {
 // Test_cfgFromEnv tests if the Jaeger Config can be successfully gotten from the env
 func Test_cfgFromEnv(t *testing.T) {
 	t.Run("When_Empty_Env", func(t *testing.T) {
-		cfg, err :=cfgFromEnv()
+		cfg, err := cfgFromEnv()
 		assert.NoError(t, err, "Retrieves without an error")
 		assert.Equal(t, true, cfg.Disabled, "Disabled by default")
 	})
@@ -65,7 +65,7 @@ func Test_cfgFromEnv(t *testing.T) {
 		defer os.Unsetenv(serviceNameVar)
 		defer os.Unsetenv(jaegerEnabledVar)
 
-		_, err :=cfgFromEnv()
+		_, err := cfgFromEnv()
 		assert.NoError(t, err, "Retrieves without an error")
 	})
 	t.Run("When_Jaeger_On_As_Sidecar_Unparseable_Bool", func(t *testing.T) {
@@ -76,7 +76,7 @@ func Test_cfgFromEnv(t *testing.T) {
 		defer os.Unsetenv(serviceNameVar)
 		defer os.Unsetenv(jaegerEnabledVar)
 
-		_, err :=cfgFromEnv()
+		_, err := cfgFromEnv()
 		assert.Error(t, err, "Retrieves with an error")
 	})
 	t.Run("When_Jaeger_On_Without_Sidecar", func(t *testing.T) {
@@ -85,29 +85,30 @@ func Test_cfgFromEnv(t *testing.T) {
 		defer os.Unsetenv(jaegerEnabledVar)
 		defer os.Unsetenv(jaegerHostVar)
 
-		_, err :=cfgFromEnv()
+		_, err := cfgFromEnv()
 		assert.NoError(t, err, "Retrieves without an error")
 	})
 	t.Run("When_Jaeger_On_Inconsistent_Env", func(t *testing.T) {
 		os.Setenv(jaegerEnabledVar, "true")
 		defer os.Unsetenv(jaegerEnabledVar)
 
-		_, err :=cfgFromEnv()
+		_, err := cfgFromEnv()
 		assert.Error(t, err, "Error raised")
 	})
 	t.Run("When_Jaeger_Off_Inconsistent_Env", func(t *testing.T) {
 		os.Setenv(jaegerEnabledVar, "false")
 		defer os.Unsetenv(jaegerEnabledVar)
 
-		cfg, err :=cfgFromEnv()
+		cfg, err := cfgFromEnv()
 		assert.NoError(t, err, "Retrieves without an error")
 		assert.Equal(t, true, cfg.Disabled, "Jaeger is disabled")
 	})
 }
+
 // TestSetupGlobalTracer tests if the global tracer can be set up
 func TestSetupGlobalTracer(t *testing.T) {
 	t.Run("When_Empty_Env", func(t *testing.T) {
-		_, err :=SetupGlobalTracer()
+		_, err := SetupGlobalTracer()
 		assert.NoError(t, err, "Sets up without an error")
 	})
 	t.Run("When_Bad_Env", func(t *testing.T) {
@@ -121,7 +122,7 @@ func TestSetupGlobalTracer(t *testing.T) {
 		defer os.Unsetenv(jaegerEnabledVar)
 		defer os.Unsetenv(jaegerSamplerParamVar)
 		defer os.Unsetenv(jaegerSamplerTypeVar)
-		_, err :=SetupGlobalTracer()
+		_, err := SetupGlobalTracer()
 		assert.Error(t, err, "Error raised")
 	})
 
@@ -131,7 +132,7 @@ func TestSetupGlobalTracer(t *testing.T) {
 		defer os.Unsetenv(jaegerEnabledVar)
 		defer os.Unsetenv(jaegerHostVar)
 
-		_, err :=SetupGlobalTracer()
+		_, err := SetupGlobalTracer()
 		assert.Error(t, err, "Error raised")
 	})
 }

@@ -42,3 +42,8 @@ _testmain.go
 /test/garbage/*.out
 /test/pass.out
 /test/run.out
+src/cover.*
+src/coverage.*
+src/test.*
+src/Gateway
+.vscode

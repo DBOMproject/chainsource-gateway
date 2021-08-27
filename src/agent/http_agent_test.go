@@ -20,14 +20,23 @@ package agent
 import (
 	"chainsource-gateway/helpers"
 	"context"
+	"testing"
+
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/h2non/gock.v1"
-	"testing"
 )
 
 // setupOKMockRemoteHttpAgent sets up a mock HTTP agent that always returns OK
 func setupOKMockRemoteHttpAgent(channelID string, recordID string) {
+	gock.New("http://mock-agent").
+		Get("/channels").
+		Reply(200).
+		JSON([]string{"test", "test2"})
+	gock.New("http://mock-agent").
+		Get("/channels/" + channelID + "/records").
+		Reply(200).
+		JSON(map[string]bool{"success": true})
 	gock.New("http://mock-agent").
 		Post("/channels/" + channelID + "/records").
 		Reply(200).
@@ -36,15 +45,35 @@ func setupOKMockRemoteHttpAgent(channelID string, recordID string) {
 		Get("/channels/" + channelID + "/records/" + recordID).
 		Reply(200).
 		JSON(map[string]string{"foo": "bar"})
+	gock.New("http://mock-agent").
+		Get("/channels/" + channelID + "/records/" + recordID + "/audit").
+		Reply(200).
+		JSON(map[string]string{"foo": "test"})
+	gock.New("http://mock-agent").
+		Get("/channels/" + channelID + "/records/_query").
+		Reply(200).
+		JSON(map[string]string{"foo": "bar"})
 }
 
 // setupFailMockRemoteHttpAgent sets up a mock HTTP agent that always returns InternalServerError
 func setupFailMockRemoteHttpAgent(channelID string, recordID string) {
 	gock.New("http://mock-agent").
+		Get("/channels").
+		Reply(500)
+	gock.New("http://mock-agent").
+		Get("/channels/" + channelID + "/records").
+		Reply(500)
+	gock.New("http://mock-agent").
 		Post("/channels/" + channelID + "/records").
 		Reply(500)
 	gock.New("http://mock-agent").
 		Get("/channels/" + channelID + "/records/" + recordID).
+		Reply(500)
+	gock.New("http://mock-agent").
+		Get("/channels/" + channelID + "/records/" + recordID + "/audit").
+		Reply(500)
+	gock.New("http://mock-agent").
+		Post("/channels/" + channelID + "/records/_query").
 		Reply(500)
 }
 
@@ -160,6 +189,67 @@ func TestHttpAgent_QueryStream(t *testing.T) {
 			ChannelID: "C1",
 			AssetID:   "A1",
 		})
+		assert.Error(t, err, "Query fails")
+	})
+}
+
+// TestHttpAgent_QueryAssets tests the agent's query method
+func TestHttpAgent_QueryAssets(t *testing.T) {
+	agent := getMockHTTPAgent()
+	t.Run("With_OK_Agent", func(t *testing.T) {
+		setupOKMockRemoteHttpAgent("C1", "A1")
+		defer gock.Off()
+		_, err := agent.QueryAssets(context.Background(), QueryArgs{
+			ChannelID: "C1",
+			AssetID:   "A1",
+		}, RichQueryArgs{Query: nil, Filter: nil, Limit: 10, Skip: 0})
+		assert.NoError(t, err, "Completes query successfully")
+	})
+	t.Run("With_Fail_Agent", func(t *testing.T) {
+		setupFailMockRemoteHttpAgent("C1", "A1")
+		defer gock.Off()
+		_, err := agent.QueryAssets(context.Background(), QueryArgs{
+			ChannelID: "C1",
+			AssetID:   "A1",
+		}, RichQueryArgs{Query: nil, Filter: nil, Limit: 10, Skip: 0})
+		assert.Error(t, err, "Query fails")
+	})
+}
+
+// TestHttpAgent_ListAssets tests the agent's ListAssets method
+func TestHttpAgent_ListAssets(t *testing.T) {
+	agent := getMockHTTPAgent()
+	t.Run("With_OK_Agent", func(t *testing.T) {
+		setupOKMockRemoteHttpAgent("C1", "A1")
+		defer gock.Off()
+		_, err := agent.ListAssets(context.Background(), QueryArgs{
+			ChannelID: "C1",
+		})
+		assert.NoError(t, err, "Completes list assets successfully")
+	})
+	t.Run("With_Fail_Agent", func(t *testing.T) {
+		setupFailMockRemoteHttpAgent("C1", "A1")
+		defer gock.Off()
+		_, err := agent.ListAssets(context.Background(), QueryArgs{
+			ChannelID: "C1",
+		})
+		assert.Error(t, err, "Query fails")
+	})
+}
+
+// TestHttpAgent_ListChannels tests the agent's ListChannels method
+func TestHttpAgent_ListChannels(t *testing.T) {
+	agent := getMockHTTPAgent()
+	t.Run("With_OK_Agent", func(t *testing.T) {
+		setupOKMockRemoteHttpAgent("", "")
+		defer gock.Off()
+		_, err := agent.ListChannels(context.Background(), QueryArgs{})
+		assert.NoError(t, err, "Completes list channels successfully")
+	})
+	t.Run("With_Fail_Agent", func(t *testing.T) {
+		setupFailMockRemoteHttpAgent("C1", "A1")
+		defer gock.Off()
+		_, err := agent.ListChannels(context.Background(), QueryArgs{})
 		assert.Error(t, err, "Query fails")
 	})
 }

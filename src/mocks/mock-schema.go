@@ -20,8 +20,9 @@ package mocks
 import (
 	context "context"
 	"errors"
-	gomock "github.com/golang/mock/gomock"
 	reflect "reflect"
+
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockAssetSchema is a mock of AssetSchema interface
@@ -43,6 +44,7 @@ func NewMockAssetSchemaAlwaysValid(ctrl *gomock.Controller) *MockAssetSchema {
 	mock.EXPECT().ValidateDetachSubasset(gomock.Any(), gomock.Any()).Return("", true, nil).AnyTimes()
 	mock.EXPECT().ValidateAttachSubasset(gomock.Any(), gomock.Any()).Return("", true, nil).AnyTimes()
 	mock.EXPECT().ValidateTransferAsset(gomock.Any(), gomock.Any()).Return("", true, nil).AnyTimes()
+	mock.EXPECT().ValidateQueryAsset(gomock.Any(), gomock.Any()).Return("", true, nil).AnyTimes()
 	return mock
 }
 
@@ -54,6 +56,7 @@ func NewMockAssetSchemaAlwaysInvalid(ctrl *gomock.Controller) *MockAssetSchema {
 	mock.EXPECT().ValidateDetachSubasset(gomock.Any(), gomock.Any()).Return("errors", false, nil).AnyTimes()
 	mock.EXPECT().ValidateAttachSubasset(gomock.Any(), gomock.Any()).Return("errors", false, nil).AnyTimes()
 	mock.EXPECT().ValidateTransferAsset(gomock.Any(), gomock.Any()).Return("errors", false, nil).AnyTimes()
+	mock.EXPECT().ValidateQueryAsset(gomock.Any(), gomock.Any()).Return("errors", false, nil).AnyTimes()
 	return mock
 }
 
@@ -62,13 +65,12 @@ func NewMockAssetSchemaAlwaysFailure(ctrl *gomock.Controller) *MockAssetSchema {
 	mock := &MockAssetSchema{ctrl: ctrl}
 	mock.recorder = &MockAssetSchemaMockRecorder{mock}
 	mock.EXPECT().ValidateAsset(gomock.Any(), gomock.Any()).Return("", false, errors.New("")).AnyTimes()
-	mock.EXPECT().ValidateDetachSubasset(gomock.Any(), gomock.Any()).Return("", false,  errors.New("")).AnyTimes()
-	mock.EXPECT().ValidateAttachSubasset(gomock.Any(), gomock.Any()).Return("", false,  errors.New("")).AnyTimes()
-	mock.EXPECT().ValidateTransferAsset(gomock.Any(), gomock.Any()).Return("", false,  errors.New("")).AnyTimes()
+	mock.EXPECT().ValidateDetachSubasset(gomock.Any(), gomock.Any()).Return("", false, errors.New("")).AnyTimes()
+	mock.EXPECT().ValidateAttachSubasset(gomock.Any(), gomock.Any()).Return("", false, errors.New("")).AnyTimes()
+	mock.EXPECT().ValidateTransferAsset(gomock.Any(), gomock.Any()).Return("", false, errors.New("")).AnyTimes()
+	mock.EXPECT().ValidateQueryAsset(gomock.Any(), gomock.Any()).Return("", false, errors.New("")).AnyTimes()
 	return mock
 }
-
-
 
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockAssetSchema) EXPECT() *MockAssetSchemaMockRecorder {
@@ -137,4 +139,20 @@ func (m *MockAssetSchema) ValidateTransferAsset(arg0 context.Context, arg1 map[s
 func (mr *MockAssetSchemaMockRecorder) ValidateTransferAsset(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateTransferAsset", reflect.TypeOf((*MockAssetSchema)(nil).ValidateTransferAsset), arg0, arg1)
+}
+
+// ValidateQueryAsset mocks base method
+func (m *MockAssetSchema) ValidateQueryAsset(arg0 context.Context, arg1 map[string]interface{}) (string, bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ValidateQueryAsset", arg0, arg1)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(bool)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// ValidateQueryAsset indicates an expected call of ValidateQueryAsset
+func (mr *MockAssetSchemaMockRecorder) ValidateQueryAsset(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ValidateQueryAsset", reflect.TypeOf((*MockAssetSchema)(nil).ValidateTransferAsset), arg0, arg1)
 }

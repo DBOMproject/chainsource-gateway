@@ -19,9 +19,10 @@ package schema
 
 import (
 	"context"
-	"github.com/stretchr/testify/assert"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 // TestNewAssetSchemaImpl tests if the Asset Schema Validator getter
@@ -71,3 +72,12 @@ func TestAssetSchemaImpl_ValidateTransferAsset(t *testing.T) {
 	}, "Runs without panicking")
 }
 
+// TestAssetSchemaImpl_ValidateTransferAsset tests if the Asset Schema Validator ValidateTransferAsset works
+func TestAssetSchemaImpl_ValidateQueryAsset(t *testing.T) {
+	assert.NotPanics(t, func() {
+		os.Chdir("../..")
+		defer os.Chdir("./src/schema")
+		payload := make(map[string]interface{})
+		NewAssetSchemaImpl().ValidateQueryAsset(context.Background(), payload)
+	}, "Runs without panicking")
+}

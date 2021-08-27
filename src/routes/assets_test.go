@@ -24,15 +24,16 @@ import (
 	"chainsource-gateway/pgp"
 	"chainsource-gateway/schema"
 	"context"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+	"testing"
+
 	"github.com/go-chi/chi"
 	"github.com/golang/mock/gomock"
 	"github.com/opentracing/opentracing-go"
 	"github.com/stretchr/testify/assert"
 	jaeger "github.com/uber/jaeger-client-go"
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
 )
 
 // TestAssetRouter tests if the asset router initializes successfully
@@ -148,6 +149,18 @@ func Test_exportContext(t *testing.T) {
 		val := ctx.Value("exportVars")
 		assert.NotNil(t, val, "exportVars must be injected")
 		assert.IsType(t, helpers.ExportRoutingVars{}, val, "Is an ExportRoutingVars instance")
+	})).ServeHTTP(responseRecorder, mockRequest)
+	assert.Equal(t, http.StatusOK, responseRecorder.Code, "A 200 OK is returned")
+}
+
+// Test_queryContext tests if the assetQueryVars is injected
+func Test_queryContext(t *testing.T) {
+	mockRequest := httptest.NewRequest("POST", "/", strings.NewReader(""))
+	responseRecorder := httptest.NewRecorder()
+	queryContext(getContextAssertionMiddleware(func(ctx context.Context) {
+		val := ctx.Value("assetQueryVars")
+		assert.NotNil(t, val, "assetQueryVars must be injected")
+		assert.IsType(t, map[string]interface{}{}, val, "Is an AssetQueryVars instance")
 	})).ServeHTTP(responseRecorder, mockRequest)
 	assert.Equal(t, http.StatusOK, responseRecorder.Code, "A 200 OK is returned")
 }

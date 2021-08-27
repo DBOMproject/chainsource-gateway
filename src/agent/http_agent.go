@@ -24,13 +24,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/spf13/viper"
 	"io"
 	"strconv"
 
+	"github.com/spf13/viper"
+
 	"github.com/opentracing/opentracing-go"
 )
-
 
 // HttpAgent is a type representing an agent that works over a RESTFUL HTTP interface
 type HttpAgent struct {
@@ -38,8 +38,7 @@ type HttpAgent struct {
 	AgentURL string
 }
 
-type HttpAgentProvider struct {}
-
+type HttpAgentProvider struct{}
 
 // CommitArgs is a type representing the arguments sent to the agent interfaces "commit" function
 type CommitArgs struct {
@@ -55,12 +54,19 @@ type QueryArgs struct {
 	AssetID   string
 }
 
+// RichQueryArgs is a type representing the arguments sent to the agent interfaces "rich query" function
+type RichQueryArgs struct {
+	Query  interface{} `json:"query"`
+	Filter []string    `json:"filter"`
+	Skip   int         `json:"skip"`
+	Limit  int         `json:"limit"`
+}
+
 // CommitBody is a type representing the request body expected by the agent on it's commit interface
 type CommitBody struct {
 	RecordID        string        `json:"recordID"`
 	RecordIDPayload helpers.Asset `json:"recordIDPayload"`
 }
-
 
 func NewHTTPAgentProvider() (p Provider) {
 	p = &HttpAgentProvider{}
@@ -76,7 +82,7 @@ func (provider *HttpAgentProvider) NewAgent(config *Config) (a Agent) {
 	return
 }
 
-func (provider *HttpAgentProvider) GetAgentConfigForRepo(repoID string) (Config, error){
+func (provider *HttpAgentProvider) GetAgentConfigForRepo(repoID string) (Config, error) {
 	agents := make(map[string]Config)
 	err := viper.UnmarshalKey("agents", &agents)
 	if err != nil {
@@ -90,7 +96,6 @@ func (provider *HttpAgentProvider) GetAgentConfigForRepo(repoID string) (Config,
 	}
 	return val, err
 }
-
 
 // Commit performs a commit on the agent
 func (a HttpAgent) Commit(ctx context.Context, args CommitArgs) (result map[string]interface{}, err error) {
@@ -120,6 +125,70 @@ func (a HttpAgent) Commit(ctx context.Context, args CommitArgs) (result map[stri
 		tracing.LogAndTraceErr(log, span, err, "Commit failed on agent")
 	}
 
+	return
+}
+
+// QueryAssets performs a rich query on the agent
+func (a HttpAgent) QueryAssets(ctx context.Context, args QueryArgs, body RichQueryArgs) (result map[string]interface{}, err error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "Query Assets")
+	defer span.Finish()
+	url := a.AgentURL
+
+	extraHeaders := make(map[string]string)
+	opentracing.GlobalTracer().Inject(
+		span.Context(),
+		opentracing.HTTPHeaders,
+		opentracing.TextMapCarrier(extraHeaders))
+
+	span.SetTag("agent-url", url)
+	queryPath := "/channels/" + args.ChannelID + "/records/_query"
+	bytesRepresentation, err := json.Marshal(body)
+
+	result, err = helpers.PostJSONRequest(url, queryPath, extraHeaders, bytesRepresentation)
+	if err != nil {
+		tracing.LogAndTraceErr(log, span, err, "Query failed on agent")
+	}
+
+	return
+}
+
+// ListChannels performs a listChannels on the agent. Returns it as a io stream
+func (a HttpAgent) ListChannels(ctx context.Context, args QueryArgs) (resultStream io.ReadCloser, err error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "List Channels")
+	defer span.Finish()
+
+	extraHeaders := make(map[string]string)
+	opentracing.GlobalTracer().Inject(
+		span.Context(),
+		opentracing.HTTPHeaders,
+		opentracing.TextMapCarrier(extraHeaders))
+
+	url := a.AgentURL
+	queryPath := "/channels"
+	resultStream, err = helpers.GetRequest(url, queryPath, extraHeaders)
+	if err != nil {
+		tracing.LogAndTraceErr(log, span, err, "Failed to list channels from agent")
+	}
+	return
+}
+
+// ListAssets performs a listAssets on the agent. Returns it as a io stream
+func (a HttpAgent) ListAssets(ctx context.Context, args QueryArgs) (resultStream io.ReadCloser, err error) {
+	span, ctx := opentracing.StartSpanFromContext(ctx, "List Assets")
+	defer span.Finish()
+
+	extraHeaders := make(map[string]string)
+	opentracing.GlobalTracer().Inject(
+		span.Context(),
+		opentracing.HTTPHeaders,
+		opentracing.TextMapCarrier(extraHeaders))
+
+	url := a.AgentURL
+	queryPath := "/channels/" + args.ChannelID + "/records"
+	resultStream, err = helpers.GetRequest(url, queryPath, extraHeaders)
+	if err != nil {
+		tracing.LogAndTraceErr(log, span, err, "Failed to list assets from agent")
+	}
 	return
 }
 
@@ -177,4 +246,3 @@ func (a HttpAgent) GetHost() string {
 func (a HttpAgent) GetPort() int {
 	return int(a.Config.Port)
 }
-

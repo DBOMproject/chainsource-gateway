@@ -15,7 +15,7 @@
  *
  */
 
-package asset
+package repo
 
 import (
 	"chainsource-gateway/agent"
