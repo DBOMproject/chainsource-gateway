@@ -30,9 +30,17 @@ import (
 // setupOKMockRemoteHttpAgent sets up a mock HTTP agent that always returns OK
 func setupOKMockRemoteHttpAgent(channelID string, recordID string) {
 	gock.New("http://mock-agent").
-		Get("/channels").
+		Get("/channels/" + channelID + "/records/" + recordID + "/audit").
 		Reply(200).
-		JSON([]string{"test", "test2"})
+		JSON(map[string]interface{}{"foo": "test"})
+	gock.New("http://mock-agent").
+		Get("/channels/" + channelID + "/records/_query").
+		Reply(200).
+		JSON(map[string]string{"foo": "bar"})
+	gock.New("http://mock-agent").
+		Get("/channels/" + channelID + "/records/" + recordID).
+		Reply(200).
+		JSON(map[string]string{"foo": "bar"})
 	gock.New("http://mock-agent").
 		Get("/channels/" + channelID + "/records").
 		Reply(200).
@@ -42,17 +50,9 @@ func setupOKMockRemoteHttpAgent(channelID string, recordID string) {
 		Reply(200).
 		JSON(map[string]bool{"success": true})
 	gock.New("http://mock-agent").
-		Get("/channels/" + channelID + "/records/" + recordID).
+		Get("/channels").
 		Reply(200).
-		JSON(map[string]string{"foo": "bar"})
-	gock.New("http://mock-agent").
-		Get("/channels/" + channelID + "/records/" + recordID + "/audit").
-		Reply(200).
-		JSON(map[string]string{"foo": "test"})
-	gock.New("http://mock-agent").
-		Get("/channels/" + channelID + "/records/_query").
-		Reply(200).
-		JSON(map[string]string{"foo": "bar"})
+		JSON([]string{"test", "test2"})
 }
 
 // setupFailMockRemoteHttpAgent sets up a mock HTTP agent that always returns InternalServerError
