@@ -15,22 +15,11 @@
  *
  */
 
-package helpers
+// Package channel contains all the controller functions for managing a channel
+package repo
 
-import "os"
+import (
+	"chainsource-gateway/helpers"
+)
 
-const defaultPort = "3005"
-
-func GetServiceAddress() (address string) {
-	if port := os.Getenv("PORT"); port != "" {
-		address = ":" + port
-	} else {
-		address = ":" + defaultPort
-	}
-	return
-}
-
-func ExistsInEnv(key string) (exists bool) {
-	_, exists = os.LookupEnv(key)
-	return
-}
+var log = helpers.GetLogger("RepoController")

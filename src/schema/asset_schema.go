@@ -26,22 +26,25 @@ type AssetSchema interface {
 	ValidateAsset(ctx context.Context, json map[string]interface{}) (schemaErrors string, isValid bool, err error)
 	ValidateAttachSubasset(ctx context.Context, json map[string]interface{}) (schemaErrors string, isValid bool, err error)
 	ValidateDetachSubasset(ctx context.Context, json map[string]interface{}) (schemaErrors string, isValid bool, err error)
+	ValidateQueryAsset(ctx context.Context, json map[string]interface{}) (schemaErrors string, isValid bool, err error)
 	ValidateTransferAsset(ctx context.Context, json map[string]interface{}) (schemaErrors string, isValid bool, err error)
 }
 
 // AssetSchemaImpl implements the AssetSchema interface using qri-io/jsonschema
 type AssetSchemaImpl struct {
-	assetSchemaLocation string
+	assetSchemaLocation          string
 	attachSubassetSchemaLocation string
 	detachSubassetSchemaLocation string
-	transferAssetSchemaLocation string
+	querySchemaLocation          string
+	transferAssetSchemaLocation  string
 }
 
-func NewAssetSchemaImpl() AssetSchemaImpl{
+func NewAssetSchemaImpl() AssetSchemaImpl {
 	return AssetSchemaImpl{
 		assetSchemaLocation:          "./src/rest_schema/asset.json",
 		attachSubassetSchemaLocation: "./src/rest_schema/attach-subasset.json",
 		detachSubassetSchemaLocation: "./src/rest_schema/detach-subasset.json",
+		querySchemaLocation:          "./src/rest_schema/query-asset.json",
 		transferAssetSchemaLocation:  "./src/rest_schema/transfer-asset.json",
 	}
 }
@@ -63,6 +66,12 @@ func (a AssetSchemaImpl) ValidateAttachSubasset(ctx context.Context, json map[st
 // validateDetachSubasset is a wrapper function to validate schema for the Detach API
 func (a AssetSchemaImpl) ValidateDetachSubasset(ctx context.Context, json map[string]interface{}) (schemaErrors string, isValid bool, err error) {
 	schemaErrors, isValid, err = coreValidator(ctx, json, a.detachSubassetSchemaLocation)
+	return
+}
+
+// ValidateQueryAsset is a wrapper function to validate schema for the query API
+func (a AssetSchemaImpl) ValidateQueryAsset(ctx context.Context, json map[string]interface{}) (schemaErrors string, isValid bool, err error) {
+	schemaErrors, isValid, err = coreValidator(ctx, json, a.querySchemaLocation)
 	return
 }
 

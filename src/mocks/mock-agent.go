@@ -21,11 +21,11 @@ package mocks
 import (
 	agent "chainsource-gateway/agent"
 	context "context"
-	gomock "github.com/golang/mock/gomock"
 	io "io"
 	reflect "reflect"
-)
 
+	gomock "github.com/golang/mock/gomock"
+)
 
 // MockAgent is a mocks of Agent interface
 type MockAgent struct {
@@ -123,4 +123,49 @@ func (m *MockAgent) QueryStream(arg0 context.Context, arg1 agent.QueryArgs) (io.
 func (mr *MockAgentMockRecorder) QueryStream(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryStream", reflect.TypeOf((*MockAgent)(nil).QueryStream), arg0, arg1)
+}
+
+// QueryAssets mocks base method
+func (m *MockAgent) QueryAssets(arg0 context.Context, arg1 agent.QueryArgs, arg2 agent.RichQueryArgs) (map[string]interface{}, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryAssets", arg0, arg1, arg2)
+	ret0, _ := ret[0].(map[string]interface{})
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// QueryAssets indicates an expected call of QueryAssets
+func (mr *MockAgentMockRecorder) QueryAssets(arg0, arg1 interface{}, arg2 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryAssets", reflect.TypeOf((*MockAgent)(nil).QueryAssets), arg0, arg1, arg2)
+}
+
+// ListChannels mocks base method
+func (m *MockAgent) ListChannels(arg0 context.Context, arg1 agent.QueryArgs) (io.ReadCloser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListChannels", arg0, arg1)
+	ret0, _ := ret[0].(io.ReadCloser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListChannels indicates an expected call of ListChannels
+func (mr *MockAgentMockRecorder) ListChannels(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListChannels", reflect.TypeOf((*MockAgent)(nil).QueryStream), arg0, arg1)
+}
+
+// ListAssets mocks base method
+func (m *MockAgent) ListAssets(arg0 context.Context, arg1 agent.QueryArgs) (io.ReadCloser, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListAssets", arg0, arg1)
+	ret0, _ := ret[0].(io.ReadCloser)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListAssets indicates an expected call of ListAssets
+func (mr *MockAgentMockRecorder) ListAssets(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListAssets", reflect.TypeOf((*MockAgent)(nil).ListAssets), arg0, arg1)
 }

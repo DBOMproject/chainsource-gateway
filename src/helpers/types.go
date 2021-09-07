@@ -24,6 +24,14 @@ type AssetRoutingVars struct {
 	AssetID   string
 }
 
+// AssetRoutingVars is a type to hold the asset context derived from the parametrized url
+type AssetQueryVars struct {
+	Query  string
+	Filter string
+	Skip   string
+	Limit  string
+}
+
 // ExportRoutingVars is a type to hold the asset context derived from the parametrized url
 type ExportRoutingVars struct {
 	FileName       string
