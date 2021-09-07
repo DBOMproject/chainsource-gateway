@@ -58,8 +58,8 @@ func TestListAssets(t *testing.T) {
 		"Stored asset is exactly equal to the sent asset when all fields are filled")
 }
 
-// TestListAssetsUInauthorizedErrorConditions checks unauthorized handling
-func TestListAssetsUInauthorizedErrorConditions(t *testing.T) {
+// TestListAssetsUnauthorizedErrorConditions checks unauthorized handling
+func TestListAssetsUnauthorizedErrorConditions(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockAgent := mocks.NewMockAgent(ctrl)
 	defer ctrl.Finish()
