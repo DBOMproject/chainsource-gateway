@@ -120,8 +120,8 @@ func TestQueryAllAssetsErrorConditions(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, responseRecorder.Result().StatusCode, "Response Should be 404 not found")
 }
 
-// TestQueryAllAssetsUInauthorizedErrorConditions checks unauthorized handling
-func TestQueryAllAssetsUInauthorizedErrorConditions(t *testing.T) {
+// TestQueryAllAssetsUnauthorizedErrorConditions checks unauthorized handling
+func TestQueryAllAssetsUnauthorizedErrorConditions(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	mockAgent := mocks.NewMockAgent(ctrl)
 	defer ctrl.Finish()
