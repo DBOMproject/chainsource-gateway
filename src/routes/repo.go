@@ -43,7 +43,7 @@ func repoSubRouting(r chi.Router) {
 	r.Use(repoContext)
 	r.Use(unmarshalBody)
 
-	// Link/Unlink APIs
+	// List channels
 	r.Get("/chan", repo.ListChannels)
 
 }

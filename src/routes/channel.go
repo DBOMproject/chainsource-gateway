@@ -43,7 +43,7 @@ func channelSubRouting(r chi.Router) {
 	r.Use(channelContext)
 	r.Use(unmarshalBody)
 
-	// Link/Unlink APIs
+	// List assets
 	r.Get("/asset", channel.ListAssets)
 
 }
