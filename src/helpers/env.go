@@ -19,7 +19,7 @@ package helpers
 
 import "os"
 
-const defaultPort = "3005"
+const defaultPort = "3000"
 
 func GetServiceAddress() (address string) {
 	if port := os.Getenv("PORT"); port != "" {
