@@ -11,7 +11,7 @@ require (
 	github.com/magiconair/properties v1.8.5
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/qri-io/jsonschema v0.1.1
-	github.com/rs/zerolog v1.25.0
+	github.com/rs/zerolog v1.26.0
 	github.com/spf13/viper v1.8.1
 	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.24.0+incompatible
