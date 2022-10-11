@@ -8,7 +8,7 @@ jobs:
   test:
     env: 
       working-directory: ./src
-      go-version:  1.15 
+      go-version:  1.19
     runs-on: ubuntu-latest
     steps:
     - name: Install Go
