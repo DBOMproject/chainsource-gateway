@@ -13,7 +13,7 @@ require (
 	github.com/qri-io/jsonschema v0.1.2
 	github.com/rs/zerolog v1.28.0
 	github.com/spf13/viper v1.13.0
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.2
 	github.com/uber/jaeger-client-go v2.24.0+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible
 	gopkg.in/h2non/gock.v1 v1.1.2
