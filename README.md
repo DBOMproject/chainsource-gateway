@@ -11,13 +11,14 @@ The gateway component for the Digital Bill of Materials
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [How to Use](#how-to-use)
-  - [API](#api)
-  - [Configuration](#configuration)
-- [Helm Deployment](#helm-deployment)
-- [Platform Support](#platform-support)
-- [Getting Help](#getting-help)
-- [Getting Involved](#getting-involved)
+- [Chainsource Gateway](#chainsource-gateway)
+  - [How to Use](#how-to-use)
+    - [API](#api)
+    - [Configuration](#configuration)
+  - [Helm Deployment](#helm-deployment)
+  - [Platform Support](#platform-support)
+  - [Getting Help](#getting-help)
+  - [Getting Involved](#getting-involved)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -25,26 +26,32 @@ The gateway component for the Digital Bill of Materials
 
 ### API
 
-Latest OpenAPI Specifications and Postman Collection Files for this API is available on the [api-specs repository](https://github.com/DBOMproject/api-specs/tree/master/gateway)
+Latest OpenAPI Specifications and Postman Collection Files for this API is available on the [api-specs repository](https://github.com/DBOMproject/api-specs/tree/2.0.0-alpha-1)
 
 ### Configuration
 
-| Environment Variable         | Default               | Description                                 |
-|------------------------------|-----------------------|---------------------------------------------|
-| LOG_LEVEL                    | `info`                | The verbosity of the logging                |
-| PORT                         | `3000`                | Port on which the gateway listens           |
-| JAEGER_ENABLED               | `false`               | Is jaeger tracing enabled                   |
-| JAEGER_HOST                  | ``                    | The jaeger host to send traces to           |
-| JAEGER_SAMPLER_PARAM         | `1`                   | The parameter to pass to the jaeger sampler |
-| JAEGER_SAMPLER_TYPE          | `const`               | The jaeger sampler type to use              |
-| JAEGER_SERVICE_NAME          | `Chainsource Gateway` | The name of the service passed to jaeger    |
-| JAEGER_AGENT_SIDECAR_ENABLED | `false`               | Is jaeger agent sidecar injection enabled   |
+
+| Environment Variable         | Default                           | Description                                 |
+| ---------------------------- | --------------------------------- | ------------------------------------------- |
+| PORT                         | `3050`                            | The Client API port number                  |
+| FED_PORT                     | `7205`                            | The federation API port number              |
+| NATS_URI                     | (Example) `nats://localhost:4222` | The NATS URI                                |
+| NODE_ID                      | (Example) `node1`                  | The node ID                                 |
+| NODE_URI                     | (Example) `node1.test.com`         | The node URI                                |
+| LOG_LEVEL                    | `info`                            | The verbosity of the logging                |
+| JAEGER_ENABLED               | `false`                           | Is jaeger tracing enabled                   |
+| JAEGER_HOST                  | ``                                | The jaeger host to send traces to           |
+| JAEGER_SAMPLER_PARAM         | `1`                               | The parameter to pass to the jaeger sampler |
+| JAEGER_SAMPLER_TYPE          | `const`                           | The jaeger sampler type to use              |
+| JAEGER_SERVICE_NAME          | `Chainsource Gateway`             | The name of the service passed to jaeger    |
+| JAEGER_AGENT_SIDECAR_ENABLED | `false`                           | Is jaeger agent sidecar injection enabled   |
+
 
 Configure `agent-config.yaml` with the details of your agent(s)
 
 ## Helm Deployment
 
-Instructions for deploying the Chainsource Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/chainsource-gateway)
+[WIP] Once Completed, instructions for deploying the Chainsource Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/chainsource-gateway)
 
 ## Platform Support
 
