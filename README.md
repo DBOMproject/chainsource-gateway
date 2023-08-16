@@ -4,14 +4,15 @@
 ![Docker Pulls](https://img.shields.io/docker/pulls/dbomproject/chainsource-gateway)
 [![Coverage Status](https://coveralls.io/repos/github/DBOMproject/chainsource-gateway/badge.svg?branch=master)](https://coveralls.io/github/DBOMproject/chainsource-gateway?branch=master)
 
-# Chainsource Gateway
+# DBoM Gateway
+
 The gateway component for the Digital Bill of Materials
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Chainsource Gateway](#chainsource-gateway)
+- [DBoM Gateway](#dbom-gateway)
   - [How to Use](#how-to-use)
     - [API](#api)
     - [Configuration](#configuration)
@@ -30,28 +31,27 @@ Latest OpenAPI Specifications and Postman Collection Files for this API is avail
 
 ### Configuration
 
-
-| Environment Variable         | Default                           | Description                                 |
-| ---------------------------- | --------------------------------- | ------------------------------------------- |
-| PORT                         | `3050`                            | The Client API port number                  |
-| FED_PORT                     | `7205`                            | The federation API port number              |
-| NATS_URI                     | (Example) `nats://localhost:4222` | The NATS URI                                |
-| NODE_ID                      | (Example) `node1`                  | The node ID                                 |
-| NODE_URI                     | (Example) `node1.test.com`         | The node URI                                |
-| LOG_LEVEL                    | `info`                            | The verbosity of the logging                |
-| JAEGER_ENABLED               | `false`                           | Is jaeger tracing enabled                   |
-| JAEGER_HOST                  | ``                                | The jaeger host to send traces to           |
-| JAEGER_SAMPLER_PARAM         | `1`                               | The parameter to pass to the jaeger sampler |
-| JAEGER_SAMPLER_TYPE          | `const`                           | The jaeger sampler type to use              |
-| JAEGER_SERVICE_NAME          | `Chainsource Gateway`             | The name of the service passed to jaeger    |
-| JAEGER_AGENT_SIDECAR_ENABLED | `false`                           | Is jaeger agent sidecar injection enabled   |
-
-
-Configure `agent-config.yaml` with the details of your agent(s)
+| Environment Variable         | Default                               | Description                                 |
+| ---------------------------- | ------------------------------------- | ------------------------------------------- |
+| PORT                         | `3050`                                | The Client API port number                  |
+| FED_PORT                     | `7205`                                | The federation API port number              |
+| NATS_URI                     | (Example) `nats://localhost:4222`     | The NATS URI                                |
+| NODE_ID                      | (Example) `node1`                     | The node ID                                 |
+| NODE_URI                     | (Example) `node1.test.com`            | The node URI                                |
+| NODE_CERT_PATH               | (Example) `/certs/node1.test.com.crt` | Node certificate                            |
+| NODE_KEY_PATH                | (Example) `/certs/node1.test.com.key` | Private key for node                        |
+| CA_CERT_PATH                 | (Example) `/certs/ca.crt`             | Root CA certificate                         |
+| LOG_LEVEL                    | `info`                                | The verbosity of the logging                |
+| JAEGER_ENABLED               | `false`                               | Is jaeger tracing enabled                   |
+| JAEGER_HOST                  | ``                                    | The jaeger host to send traces to           |
+| JAEGER_SAMPLER_PARAM         | `1`                                   | The parameter to pass to the jaeger sampler |
+| JAEGER_SAMPLER_TYPE          | `const`                               | The jaeger sampler type to use              |
+| JAEGER_SERVICE_NAME          | `Chainsource Gateway`                 | The name of the service passed to jaeger    |
+| JAEGER_AGENT_SIDECAR_ENABLED | `false`                               | Is jaeger agent sidecar injection enabled   |
 
 ## Helm Deployment
 
-[WIP] Once Completed, instructions for deploying the Chainsource Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/chainsource-gateway)
+[WIP] Once Completed, instructions for deploying the DBoM Gateway using helm charts can be found [here](https://github.com/DBOMproject/deployments/tree/master/charts/chainsource-gateway)
 
 ## Platform Support
 
@@ -59,7 +59,7 @@ Currently, we provide pre-built container images for linux amd64 and arm64 archi
 
 ## Getting Help
 
-If you have any queries on chainsource-gateway, feel free to reach us on any of our [communication channels](https://github.com/DBOMproject/community/blob/master/COMMUNICATION.md) 
+If you have any queries on chainsource-gateway, feel free to reach us on any of our [communication channels](https://github.com/DBOMproject/community/blob/master/COMMUNICATION.md)
 
 If you have questions, concerns, bug reports, etc, please file an issue in this repository's [issue tracker](https://github.com/DBOMproject/chainsource-gateway/issues).
 
