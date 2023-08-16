@@ -1,0 +1,14 @@
+{
+  "channelId": "channel1",
+  "description": "Channel1 of Node 1 - Remote",
+  "type": "TEST_CHANNEL",
+  "notaries": [
+      {
+          "id": "ahgsduih",
+          "type": "SIGNED",
+          "config": {}
+      }
+  ],
+  "createdAt": "2023-08-13T22:08:42.986Z",
+  "modifiedAt": "2023-08-13T22:08:42.986Z"
+}

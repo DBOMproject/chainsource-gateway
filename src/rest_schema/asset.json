@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "standardVersion",
+    "schemaUrl",
+    "created",
+    "modified",
+    "notarizations",
+    "links",
+    "signatures",
+    "body",
+    "id"
+  ],
+  "properties": {
+    "standardVersion": {
+      "type": "number",
+      "minLength": 1
+    },
+    "schemaUrl": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created": {
+      "type": "string",
+      "minLength": 1
+    },
+    "modified": {
+      "type": "string",
+      "minLength": 1
+    },
+    "notarizations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "notaryId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "notaryMeta": {
+            "type": "object",
+            "default": {}
+          }
+        },
+        "required": ["notaryId", "notaryMeta"]
+      }
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "assetUri": {
+            "type": "string",
+            "minLength": 1
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "comment": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": ["assetUri", "type", "comment", "id"]
+      }
+    },
+    "signatures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hashType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "signType": {
+            "type": "string",
+            "minLength": 1
+          },
+          "signMeta": {
+            "type": "object",
+            "properties": {
+              "authority": {
+                "type": "string",
+                "minLength": 1
+              },
+              "keyId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "sign": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": ["authority", "keyId", "sign"]
+          }
+        },
+        "required": ["hashType", "signType", "signMeta"]
+      }
+    },
+    "body": {
+      "type": "object",
+      "default": {}
+    },
+    "id": {
+      "type": "string"
+    }
+  }
+}
