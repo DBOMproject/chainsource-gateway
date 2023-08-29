@@ -65,7 +65,7 @@ func PostJSONRequest(url string, body []byte) (resp *http.Response, err error) {
 	tlsConfig := &tls.Config{
 		Certificates:       []tls.Certificate{cert},
 		RootCAs:            caCertPool,
-		InsecureSkipVerify: true,
+		InsecureSkipVerify: false,
 	}
 
 	client := &http.Client{
@@ -124,7 +124,7 @@ func GetRequest(url string) (result io.ReadCloser, err error) {
 	tlsConfig := &tls.Config{
 		Certificates:       []tls.Certificate{cert},
 		RootCAs:            caCertPool,
-		InsecureSkipVerify: true,
+		InsecureSkipVerify: false,
 	}
 
 	client := &http.Client{
