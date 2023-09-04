@@ -49,18 +49,6 @@ func AcceptRequest(w http.ResponseWriter, r *http.Request) {
 	var acceptRequest helpers.FederationRequestOperations
 	json.NewDecoder(r.Body).Decode(&acceptRequest)
 
-	js, jsErr := nc.JetStream(nats.PublishAsyncMaxPending(helpers.PublishAsyncMaxPendingConstant))
-	if jsErr != nil {
-		logger.Err(jsErr).Msg(helpers.NatsJetStreamError)
-		helpers.HandleError(w, r, helpers.NatsJetStreamError)
-		return
-	}
-
-	js.AddStream(&nats.StreamConfig{
-		Name:     "federation",
-		Subjects: []string{"accept"},
-	})
-
 	request := helpers.FederationRequestBody{
 		RequestID: chi.URLParam(r, "request_id"),
 		Type:      acceptRequest.Type,
@@ -72,65 +60,74 @@ func AcceptRequest(w http.ResponseWriter, r *http.Request) {
 		helpers.HandleError(w, r, helpers.MarshalErr)
 		return
 	}
+	// Send the request
+	msgAccept, msgAcceptErr := nc.Request("federation.accept", requestMarshal, helpers.TimeOut*time.Second)
+	if msgAcceptErr != nil {
+		logger.Err(msgAcceptErr).Msgf(helpers.MsgErr)
+		helpers.HandleError(w, r, helpers.MsgErr)
+		return
+	}
 
-	js.PublishAsync("federation.accept", requestMarshal)
+	var msgAcceptResponse helpers.FederationResultResponse
+	unmarshalErr := json.Unmarshal([]byte(string(msgAccept.Data)), &msgAcceptResponse)
+	if unmarshalErr != nil {
+		logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
+		helpers.HandleError(w, r, helpers.UnmarshalErr)
+		return
+	}
 
-	select {
-	case <-js.PublishAsyncComplete():
-		{
-			// Send the request
-			msg, msgErr := nc.Request("federation.one", requestMarshal, helpers.TimeOut*time.Second)
-			if msgErr != nil {
-				logger.Err(msgErr).Msgf(helpers.MsgErr)
-				helpers.HandleError(w, r, helpers.MsgErr)
-				return
-			}
-
-			logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
-
-			// Use the response
-			var response []helpers.FederationMeta
-			unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
-			if unmarshalErr != nil {
-				logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
-				helpers.HandleError(w, r, helpers.UnmarshalErr)
-				return
-			}
-			acceptRequestSelf := helpers.FederationRequestOperations{
-				Type:      "ACCEPT",
-				NodeID:    helpers.GetNodeID(),
-				ChannelID: response[0].ChannelID,
-			}
-			marshalRequest, marshalErr := json.Marshal(acceptRequestSelf)
-			if marshalErr != nil {
-				logger.Err(marshalErr).Msgf(helpers.MarshalErr)
-				helpers.HandleError(w, r, helpers.MarshalErr)
-				return
-			}
-			var host = response[0].NodeURI + ":7205"
-			updateRes, updateErr := helpers.PostJSONRequest("https://"+host+"/api/v2/federation/requests/nodes/update", []byte(marshalRequest))
-			if updateErr != nil {
-				http.Error(w, "Error in updating data", http.StatusInternalServerError)
-				helpers.HandleError(w, r, "Error in updating data")
-				return
-			}
-			data, err := io.ReadAll(updateRes.Body)
-			if err != nil {
-				http.Error(w, "Error reading data", http.StatusInternalServerError)
-				helpers.HandleError(w, r, "Error reading data")
-				return
-			}
-			parsedData, err := helpers.ParseJSONData(data)
-			logger.Info().Msgf("Parsed Data %v", parsedData)
-
-			if err != nil {
-				http.Error(w, "Error parsing JSON", http.StatusInternalServerError)
-				helpers.HandleError(w, r, "Error parsing JSON")
-				return
-			}
-			render.Render(w, r, responses.SuccessfulFederationAcceptResponse())
+	if msgAcceptResponse.Success {
+		msg, msgErr := nc.Request("federation.one", requestMarshal, helpers.TimeOut*time.Second)
+		if msgErr != nil {
+			logger.Err(msgErr).Msgf(helpers.MsgErr)
+			helpers.HandleError(w, r, helpers.MsgErr)
+			return
 		}
-	case <-time.After(helpers.TimeOut * time.Second):
-		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.TimeOutErr)))
+
+		logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
+
+		// Use the response
+		var response helpers.FederationResultResponse
+		unmarshalResErr := json.Unmarshal([]byte(string(msg.Data)), &response)
+		if unmarshalResErr != nil {
+			logger.Err(unmarshalResErr).Msgf(helpers.UnmarshalErr)
+			helpers.HandleError(w, r, helpers.UnmarshalErr)
+			return
+		}
+		acceptRequestSelf := helpers.FederationRequestOperations{
+			Type:      "ACCEPT",
+			NodeID:    helpers.GetNodeID(),
+			ChannelID: response.Result[0].ChannelID,
+		}
+		marshalRequest, marshalErr := json.Marshal(acceptRequestSelf)
+		if marshalErr != nil {
+			logger.Err(marshalErr).Msgf(helpers.MarshalErr)
+			helpers.HandleError(w, r, helpers.MarshalErr)
+			return
+		}
+		var host = response.Result[0].NodeURI + ":7205"
+		updateRes, updateErr := helpers.PostJSONRequest("https://"+host+"/api/v2/federation/requests/nodes/update", []byte(marshalRequest))
+		if updateErr != nil {
+			http.Error(w, "Error in updating data", http.StatusInternalServerError)
+			helpers.HandleError(w, r, "Error in updating data")
+			return
+		}
+		data, err := io.ReadAll(updateRes.Body)
+		if err != nil {
+			http.Error(w, "Error reading data", http.StatusInternalServerError)
+			helpers.HandleError(w, r, "Error reading data")
+			return
+		}
+		parsedData, err := helpers.ParseJSONData(data)
+		logger.Info().Msgf("Parsed Data %v", parsedData)
+
+		if err != nil {
+			http.Error(w, "Error parsing JSON", http.StatusInternalServerError)
+			helpers.HandleError(w, r, "Error parsing JSON")
+			return
+		}
+		render.Render(w, r, responses.SuccessfulFederationAcceptResponse())
+	} else {
+		render.Render(w, r, responses.ErrCustom(errors.New(msgAcceptResponse.Status)))
 	}
 }

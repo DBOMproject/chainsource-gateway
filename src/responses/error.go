@@ -55,6 +55,17 @@ func NatsURLError(err error) render.Renderer {
 
 // User-Errors (4xx)
 
+// Custom errors
+func ErrCustom(err error) render.Renderer {
+	return &ErrResponse{
+		IsSuccessful:   false,
+		Err:            err,
+		HTTPStatusCode: 400,
+		StatusText:     "Something went wrong",
+		ErrorText:      err.Error(),
+	}
+}
+
 // ErrInvalidRequest returns error for when an invalid request is received
 func ErrInvalidRequest(err error) render.Renderer {
 	return &ErrResponse{
