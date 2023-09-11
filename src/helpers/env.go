@@ -23,6 +23,7 @@ import (
 
 const defaultPort = "3050"
 const federationPort = "7205"
+const certPath = "/app/certs/"
 
 func GetServiceAddress() (address string) {
 	if port := os.Getenv("PORT"); port != "" {
@@ -58,12 +59,12 @@ func ExistsInEnv(key string) (exists bool) {
 }
 
 func GetCACertificate() (CAPath string) {
-	CAPath = os.Getenv("CA_CERT_PATH")
+	CAPath = certPath + "ca.crt"
 	return
 }
 
 func GetNodeCertificate() (certFile string, keyFile string) {
-	certFile = os.Getenv("NODE_CERT_PATH")
-	keyFile = os.Getenv("NODE_KEY_PATH")
+	certFile = certPath + os.Getenv("NODE_URI") + ".crt"
+	keyFile = certPath + os.Getenv("NODE_URI") + ".key"
 	return
 }

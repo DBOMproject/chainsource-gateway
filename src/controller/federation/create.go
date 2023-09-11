@@ -47,17 +47,6 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 	var federationRequest helpers.FederationRequestOperations
 	json.NewDecoder(r.Body).Decode(&federationRequest)
 
-	js, jsErr := nc.JetStream(nats.PublishAsyncMaxPending(helpers.PublishAsyncMaxPendingConstant))
-	if jsErr != nil {
-		logger.Err(jsErr).Msg(helpers.NatsJetStreamError)
-		helpers.HandleError(w, r, helpers.NatsJetStreamError)
-		return
-	}
-
-	js.AddStream(&nats.StreamConfig{
-		Name:     "federation",
-		Subjects: []string{"create"},
-	})
 	request := helpers.FederationRequestOperations{
 		NodeURI:   federationRequest.NodeURI,
 		NodeID:    federationRequest.NodeID,
@@ -70,12 +59,28 @@ func CreateRequest(w http.ResponseWriter, r *http.Request) {
 		helpers.HandleError(w, r, helpers.MarshalErr)
 		return
 	}
-	js.PublishAsync("federation.create", requestMarshal)
+	// Send the request
+	msg, msgErr := nc.Request("federation.create", requestMarshal, helpers.TimeOut*time.Second)
+	if msgErr != nil {
+		logger.Err(msgErr).Msgf(helpers.MsgErr)
+		helpers.HandleError(w, r, helpers.MsgErr)
+		return
+	}
 
-	select {
-	case <-js.PublishAsyncComplete():
-		render.Render(w, r, responses.SuccessfulFederationSentResponse())
-	case <-time.After(helpers.TimeOut * time.Second):
-		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.TimeOutErr)))
+	logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
+
+	// Use the response
+	var response helpers.FederationResultResponse
+	unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
+	if unmarshalErr != nil {
+		logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
+		helpers.HandleError(w, r, helpers.UnmarshalErr)
+		return
+	}
+
+	if response.Success {
+		render.Render(w, r, responses.SuccessfulCreateResponse(response.Status))
+	} else {
+		render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
 	}
 }

@@ -42,7 +42,7 @@ func Validate(w http.ResponseWriter, r *http.Request) bool {
 	nodeIdFromUri := strings.Split(chi.URLParam(r, "node_uri"), ".")[0]
 	channelFromUri := chi.URLParam(r, "channel_id")
 	nodeMetaData := node.GetNodeDetailsFromId(helpers.GetNodeID())
-	logger.Info().Msgf("Node _metadata from Channel: %v\n", nodeMetaData)
+	logger.Info().Msgf("Node metadata from Channel: %v\n", nodeMetaData)
 
 	for _, nodeConn := range nodeMetaData.NodeConnections {
 		if nodeConn.NodeId == nodeIdFromUri && nodeConn.Status == "FEDERATION_SUCCESS" {
@@ -87,10 +87,10 @@ func ListChannels(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
 
 		// Use the response
-		var response []helpers.Channel
+		var response helpers.ChannelResultResponse
 		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 		if unmarshalErr != nil {
 			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
@@ -98,9 +98,13 @@ func ListChannels(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		render.JSON(w, r, response)
+		if response.Success {
+			render.JSON(w, r, response)
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+		}
 	} else {
-		render.Render(w, r, responses.ErrDoesNotExist(errors.New(helpers.InvalidRequest)))
+		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.InvalidRequest)))
 	}
 }
 
@@ -140,10 +144,10 @@ func ListOneChannel(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
 
 		// Use the response
-		var response []helpers.Channel
+		var response helpers.ChannelResultResponse
 		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 		if unmarshalErr != nil {
 			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
@@ -151,7 +155,11 @@ func ListOneChannel(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		render.JSON(w, r, response)
+		if response.Success {
+			render.JSON(w, r, response)
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+		}
 	} else {
 		var host = nodeUri + ":7205"
 		if Validate(w, r) {
@@ -164,16 +172,21 @@ func ListOneChannel(w http.ResponseWriter, r *http.Request) {
 			data, err := io.ReadAll(res)
 			if err != nil {
 				http.Error(w, helpers.ReadingErr, http.StatusInternalServerError)
+				helpers.HandleError(w, r, helpers.ReadingErr)
 				return
 			}
-			var response []helpers.Channel
+			var response helpers.ChannelResultResponse
 			unmarshalErr := json.Unmarshal([]byte(string(data)), &response)
 			if unmarshalErr != nil {
 				logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
 				helpers.HandleError(w, r, helpers.UnmarshalErr)
 				return
 			}
-			render.JSON(w, r, response)
+			if response.Success {
+				render.JSON(w, r, response)
+			} else {
+				render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+			}
 		} else {
 			body := helpers.FederationRequestOperations{
 				NodeURI:   helpers.GetNodeURI(),
@@ -192,8 +205,8 @@ func ListOneChannel(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 
-			if res.StatusCode == http.StatusOK {
-				// Update _metadata locally
+			if res.StatusCode == http.StatusCreated {
+				// Update metadata locally
 				nodeMetaBody := helpers.FederationRequestOperations{
 					NodeID:    nodeIdFromRequest,
 					ChannelID: channelIdFromRequest,
@@ -204,17 +217,19 @@ func ListOneChannel(w http.ResponseWriter, r *http.Request) {
 
 				data, err := io.ReadAll(res.Body)
 				if err != nil {
-					http.Error(w, "Error reading data", http.StatusInternalServerError)
+					http.Error(w, helpers.ReadingErr, http.StatusInternalServerError)
+					helpers.HandleError(w, r, helpers.ReadingErr)
 					return
 				}
 				parsedData, err := helpers.ParseJSONData(data)
 				if err != nil {
-					http.Error(w, "Error parsing JSON", http.StatusInternalServerError)
+					http.Error(w, helpers.ParseErr, http.StatusInternalServerError)
+					helpers.HandleError(w, r, helpers.ParseErr)
 					return
 				}
 				render.JSON(w, r, parsedData)
 			} else {
-				render.Render(w, r, responses.ErrDoesNotExist(errors.New(helpers.InvalidRequest)))
+				render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.InvalidRequest)))
 			}
 		}
 	}

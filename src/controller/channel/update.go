@@ -37,6 +37,7 @@ func UpdateChannel(w http.ResponseWriter, r *http.Request) {
 	var nodeUri = chi.URLParam(r, "node_uri")
 	var nodeIdFromRequest = strings.Split(nodeUri, ".")[0]
 	var channelIdFromRequest = chi.URLParam(r, "channel_id")
+	logger.Info().Msgf("Received request to update notary on channel %s", channelIdFromRequest)
 
 	if nodeIdFromRequest == helpers.LocalNodeId || nodeIdFromRequest == helpers.GetNodeID() {
 		// Connect to NATS
@@ -52,18 +53,6 @@ func UpdateChannel(w http.ResponseWriter, r *http.Request) {
 		var channelUpdateBody helpers.UpdateChannelRequestMeta
 		json.NewDecoder(r.Body).Decode(&channelUpdateBody)
 
-		js, jsErr := nc.JetStream(nats.PublishAsyncMaxPending(helpers.PublishAsyncMaxPendingConstant))
-		if jsErr != nil {
-			logger.Err(jsErr).Msg(helpers.NatsJetStreamError)
-			helpers.HandleError(w, r, helpers.NatsJetStreamError)
-			return
-		}
-
-		js.AddStream(&nats.StreamConfig{
-			Name:     "channel",
-			Subjects: []string{"update"},
-		})
-
 		request := helpers.UpdateChannelMeta{
 			ChannelID: channelIdFromRequest,
 			NotaryID:  channelUpdateBody,
@@ -76,15 +65,31 @@ func UpdateChannel(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		js.PublishAsync("channel.update", requestMarshal)
+		// Send the request
+		msg, msgErr := nc.Request("channel.update", requestMarshal, helpers.TimeOut*time.Second)
+		if msgErr != nil {
+			logger.Err(msgErr).Msgf(helpers.MsgErr)
+			helpers.HandleError(w, r, helpers.MsgErr)
+			return
+		}
 
-		select {
-		case <-js.PublishAsyncComplete():
-			render.Render(w, r, responses.SuccessfulChannelUpdateResponse())
-		case <-time.After(helpers.TimeOut * time.Second):
-			render.Render(w, r, responses.ErrFailedModifyDestination(errors.New(helpers.TimeOutErr)))
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
+
+		// Use the response
+		var response helpers.ChannelResultResponse
+		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
+		if unmarshalErr != nil {
+			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
+			helpers.HandleError(w, r, helpers.UnmarshalErr)
+			return
+		}
+
+		if response.Success {
+			render.Render(w, r, responses.SuccessfulOkResponse(response.Status))
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
 		}
 	} else {
-		render.Render(w, r, responses.ErrDoesNotExist(errors.New(helpers.InvalidRequest)))
+		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.InvalidRequest)))
 	}
 }

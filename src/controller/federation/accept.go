@@ -68,6 +68,8 @@ func AcceptRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	logger.Info().Msgf(helpers.Response+" %s\n", msgAccept.Data)
+
 	var msgAcceptResponse helpers.FederationResultResponse
 	unmarshalErr := json.Unmarshal([]byte(string(msgAccept.Data)), &msgAcceptResponse)
 	if unmarshalErr != nil {
@@ -84,7 +86,7 @@ func AcceptRequest(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
 
 		// Use the response
 		var response helpers.FederationResultResponse
@@ -108,25 +110,30 @@ func AcceptRequest(w http.ResponseWriter, r *http.Request) {
 		var host = response.Result[0].NodeURI + ":7205"
 		updateRes, updateErr := helpers.PostJSONRequest("https://"+host+"/api/v2/federation/requests/nodes/update", []byte(marshalRequest))
 		if updateErr != nil {
-			http.Error(w, "Error in updating data", http.StatusInternalServerError)
-			helpers.HandleError(w, r, "Error in updating data")
+			http.Error(w, helpers.UpdateErr, http.StatusInternalServerError)
+			helpers.HandleError(w, r, helpers.UpdateErr)
 			return
 		}
 		data, err := io.ReadAll(updateRes.Body)
 		if err != nil {
-			http.Error(w, "Error reading data", http.StatusInternalServerError)
-			helpers.HandleError(w, r, "Error reading data")
+			http.Error(w, helpers.ReadingErr, http.StatusInternalServerError)
+			helpers.HandleError(w, r, helpers.ReadingErr)
 			return
 		}
 		parsedData, err := helpers.ParseJSONData(data)
 		logger.Info().Msgf("Parsed Data %v", parsedData)
 
 		if err != nil {
-			http.Error(w, "Error parsing JSON", http.StatusInternalServerError)
-			helpers.HandleError(w, r, "Error parsing JSON")
+			http.Error(w, helpers.ParseErr, http.StatusInternalServerError)
+			helpers.HandleError(w, r, helpers.ParseErr)
 			return
 		}
-		render.Render(w, r, responses.SuccessfulFederationAcceptResponse())
+
+		if msgAcceptResponse.Success {
+			render.Render(w, r, responses.SuccessfulOkResponse(msgAcceptResponse.Status))
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(msgAcceptResponse.Status)))
+		}
 	} else {
 		render.Render(w, r, responses.ErrCustom(errors.New(msgAcceptResponse.Status)))
 	}

@@ -45,17 +45,6 @@ func UpdateNodeDetails(w http.ResponseWriter, r *http.Request) {
 	var nodeUpdateRequest helpers.FederationRequestOperations
 	json.NewDecoder(r.Body).Decode(&nodeUpdateRequest)
 
-	js, jsErr := nc.JetStream(nats.PublishAsyncMaxPending(helpers.PublishAsyncMaxPendingConstant))
-	if jsErr != nil {
-		logger.Err(jsErr).Msg(helpers.NatsJetStreamError)
-		helpers.HandleError(w, r, helpers.NatsJetStreamError)
-		return
-	}
-
-	js.AddStream(&nats.StreamConfig{
-		Name:     "node",
-		Subjects: []string{"update"},
-	})
 	request := helpers.FederationRequestOperations{
 		NodeID:    nodeUpdateRequest.NodeID,
 		ChannelID: nodeUpdateRequest.ChannelID,
@@ -68,13 +57,28 @@ func UpdateNodeDetails(w http.ResponseWriter, r *http.Request) {
 		helpers.HandleError(w, r, helpers.MarshalErr)
 		return
 	}
-	js.PublishAsync("node.update", requestMarshal)
 
-	select {
-	case <-js.PublishAsyncComplete():
-		render.Render(w, r, responses.SuccessfulFederationSentResponse())
-	case <-time.After(helpers.TimeOut * time.Second):
-		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.TimeOutErr)))
+	// Send the request
+	msg, msgErr := nc.Request("node.update", requestMarshal, helpers.TimeOut*time.Second)
+	if msgErr != nil {
+		logger.Err(msgErr).Msgf(helpers.MsgErr)
+		return
+	}
+
+	logger.Info().Msgf(helpers.Response + "\n")
+
+	// Use the response
+	var response helpers.NodeResultResponse
+	unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
+	if unmarshalErr != nil {
+		logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
+		return
+	}
+
+	if response.Success {
+		render.JSON(w, r, response)
+	} else {
+		render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
 	}
 }
 

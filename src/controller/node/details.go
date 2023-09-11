@@ -19,7 +19,9 @@ package node
 
 import (
 	"chainsource-gateway/helpers"
+	"chainsource-gateway/responses"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"os"
 	"strings"
@@ -60,17 +62,23 @@ func GetNodeDetails(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logger.Info().Msgf(helpers.Success + "\n")
+		logger.Info().Msgf(helpers.Response + "\n")
 
 		// Use the response
-		var response []helpers.Node
+		var response helpers.NodeResultResponse
 		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 		if unmarshalErr != nil {
 			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
 			return
 		}
 
-		render.JSON(w, r, response)
+		if response.Success {
+			render.JSON(w, r, response)
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+		}
+	} else {
+		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.InvalidRequest)))
 	}
 }
 
@@ -96,12 +104,12 @@ func GetNodeDetailsFromId(nodeId string) helpers.Node {
 		return helpers.Node{}
 	}
 
-	var response []helpers.Node
+	var response helpers.NodeResultResponse
 	unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 	if unmarshalErr != nil {
 		logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
 		return helpers.Node{}
 	}
 
-	return response[0]
+	return response.Result[0]
 }

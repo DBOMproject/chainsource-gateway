@@ -48,18 +48,6 @@ func RevokeRequest(w http.ResponseWriter, r *http.Request) {
 	var revokeRequest helpers.FederationRequestOperations
 	json.NewDecoder(r.Body).Decode(&revokeRequest)
 
-	js, jsErr := nc.JetStream(nats.PublishAsyncMaxPending(helpers.PublishAsyncMaxPendingConstant))
-	if jsErr != nil {
-		logger.Err(jsErr).Msg(helpers.NatsJetStreamError)
-		helpers.HandleError(w, r, helpers.NatsJetStreamError)
-		return
-	}
-
-	js.AddStream(&nats.StreamConfig{
-		Name:     "federation",
-		Subjects: []string{"revoke"},
-	})
-
 	requestMarshal, marshalErr := json.Marshal(revokeRequest)
 	if marshalErr != nil {
 		logger.Err(marshalErr).Msgf(helpers.MarshalErr)
@@ -67,46 +55,60 @@ func RevokeRequest(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	js.PublishAsync("federation.revoke", requestMarshal)
+	// Send the request
+	msgRevoke, msgRevokeErr := nc.Request("federation.revoke", requestMarshal, helpers.TimeOut*time.Second)
+	if msgRevokeErr != nil {
+		logger.Err(msgRevokeErr).Msgf(helpers.MsgErr)
+		helpers.HandleError(w, r, helpers.MsgErr)
+		return
+	}
+	logger.Info().Msgf(helpers.Response+" %s\n", msgRevoke.Data)
 
-	select {
-	case <-js.PublishAsyncComplete():
-		{
-			var host = revokeRequest.NodeURI + ":7205"
-			revokeRequestSelf := helpers.FederationRequestOperations{
-				Type:      revokeRequest.Type,
-				NodeID:    helpers.GetNodeID(),
-				ChannelID: revokeRequest.ChannelID,
-			}
-			revokeRequestMarshal, marshalErr := json.Marshal(revokeRequestSelf)
-			if marshalErr != nil {
-				logger.Err(marshalErr).Msgf(helpers.MarshalErr)
-				helpers.HandleError(w, r, helpers.MarshalErr)
-				return
-			}
-			updateRes, updateErr := helpers.PostJSONRequest("https://"+host+"/api/v2/federation/requests/nodes/update", []byte(revokeRequestMarshal))
-			if updateErr != nil {
-				http.Error(w, "Error in updating data", http.StatusInternalServerError)
-				helpers.HandleError(w, r, "Error in updating data")
-				return
-			}
-			data, err := io.ReadAll(updateRes.Body)
-			if err != nil {
-				http.Error(w, "Error reading data", http.StatusInternalServerError)
-				helpers.HandleError(w, r, "Error reading data")
-				return
-			}
-			parsedData, err := helpers.ParseJSONData(data)
-			logger.Info().Msgf("Parsed Data %v", parsedData)
+	var msgRevokeResponse helpers.FederationResultResponse
+	unmarshalErr := json.Unmarshal([]byte(string(msgRevoke.Data)), &msgRevokeResponse)
+	if unmarshalErr != nil {
+		logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
+		helpers.HandleError(w, r, helpers.UnmarshalErr)
+		return
+	}
 
-			if err != nil {
-				http.Error(w, "Error parsing JSON", http.StatusInternalServerError)
-				helpers.HandleError(w, r, "Error parsing JSON")
-				return
-			}
-			render.Render(w, r, responses.SuccessfulFederationRevokeResponse())
+	if msgRevokeResponse.Success {
+		var host = revokeRequest.NodeURI + ":7205"
+		revokeRequestSelf := helpers.FederationRequestOperations{
+			Type:      revokeRequest.Type,
+			NodeID:    helpers.GetNodeID(),
+			ChannelID: revokeRequest.ChannelID,
 		}
-	case <-time.After(helpers.TimeOut * time.Second):
-		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.TimeOutErr)))
+		revokeRequestMarshal, marshalErr := json.Marshal(revokeRequestSelf)
+		if marshalErr != nil {
+			logger.Err(marshalErr).Msgf(helpers.MarshalErr)
+			helpers.HandleError(w, r, helpers.MarshalErr)
+			return
+		}
+		updateRes, updateErr := helpers.PostJSONRequest("https://"+host+"/api/v2/federation/requests/nodes/update", []byte(revokeRequestMarshal))
+		if updateErr != nil {
+			http.Error(w, helpers.UpdateErr, http.StatusInternalServerError)
+			helpers.HandleError(w, r, helpers.UpdateErr)
+			return
+		}
+		data, err := io.ReadAll(updateRes.Body)
+		if err != nil {
+			http.Error(w, helpers.ReadingErr, http.StatusInternalServerError)
+			helpers.HandleError(w, r, helpers.ReadingErr)
+			return
+		}
+		parsedData, err := helpers.ParseJSONData(data)
+		logger.Info().Msgf("Parsed Data %v", parsedData)
+
+		if err != nil {
+			http.Error(w, helpers.ParseErr, http.StatusInternalServerError)
+			helpers.HandleError(w, r, helpers.ParseErr)
+			return
+		}
+		if msgRevokeResponse.Success {
+			render.Render(w, r, responses.SuccessfulOkResponse(msgRevokeResponse.Status))
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(msgRevokeResponse.Status)))
+		}
 	}
 }

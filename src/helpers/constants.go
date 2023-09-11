@@ -19,27 +19,31 @@ package helpers
 
 const (
 	// Errors
-	NatsConnectError   = "Error connecting to NATS"
-	NatsJetStreamError = "Error connecting to JetStream"
-	MarshalErr         = "Error marshalling message"
-	UnmarshalErr       = "Error unmarshalling message"
-	MsgErr             = "Error sending message"
+	NatsConnectError   = "error connecting to NATS"
+	NatsJetStreamError = "error connecting to JetStream"
+	MarshalErr         = "error marshalling message"
+	UnmarshalErr       = "error unmarshalling message"
+	MsgErr             = "error sending message"
 	TimeOutErr         = "timeout"
-	NotImplemented     = "Not Implemented"
-	ResponseErr        = "Error in receiving response"
-	ReadingErr         = "Error reading data"
-	DecodeErr          = "Error decoding data"
-	Unauthorized       = "Requested action not authorized"
-	InvalidRequest     = "invalid request, please check the request body and try again"
+	NotImplemented     = "not implemented"
+	ResponseErr        = "error in receiving response"
+	ReadingErr         = "error reading data"
+	DecodeErr          = "error decoding data"
+	ParseErr           = "error parsing JSON"
+	Unauthorized       = "requested action not authorized"
+	InvalidRequest     = "invalid request"
+	UpdateErr          = "error in updating data"
 
 	// Results
-	Success = "Success - Received response:"
+	Response = "received response:"
 
 	// Loggers
-	AssetLogger      = "Asset"
-	ChannelLogger    = "Channel"
-	FederationLogger = "Federation"
-	NodeLogger       = "Node"
+	AssetLogger      = "[ASSET]"
+	ChannelLogger    = "[CHANNEL]"
+	FederationLogger = "[FEDERATION]"
+	NodeLogger       = "[NODE]"
+	HttpClient       = "[HttpClient]"
+	Main             = "[MAIN]"
 
 	// Constant Numbers
 	TimeOut                        = 5

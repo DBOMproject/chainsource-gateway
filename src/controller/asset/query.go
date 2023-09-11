@@ -58,18 +58,6 @@ func QueryAsset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		js, jsErr := nc.JetStream(nats.PublishAsyncMaxPending(helpers.PublishAsyncMaxPendingConstant))
-		if jsErr != nil {
-			logger.Err(jsErr).Msg(helpers.NatsJetStreamError)
-			helpers.HandleError(w, r, helpers.NatsJetStreamError)
-			return
-		}
-
-		js.AddStream(&nats.StreamConfig{
-			Name:     "asset",
-			Subjects: []string{"query"},
-		})
-
 		request := helpers.AssetQueryRoutingVars{
 			ChannelID: channelIdFromRequest,
 			Query:     query,
@@ -90,9 +78,9 @@ func QueryAsset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
 
-		var response []helpers.AssetMeta
+		var response helpers.AssetResultResponse
 		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 		if unmarshalErr != nil {
 			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
@@ -100,9 +88,13 @@ func QueryAsset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		render.JSON(w, r, response)
+		if response.Success {
+			render.JSON(w, r, response)
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+		}
 	} else {
-		render.Render(w, r, responses.ErrDoesNotExist(errors.New(helpers.InvalidRequest)))
+		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.InvalidRequest)))
 	}
 }
 
@@ -123,26 +115,6 @@ func RichQueryAsset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer nc.Close()
-
-		// Get body contents
-		var query helpers.QueryMeta
-		if err := json.NewDecoder(r.Body).Decode(&query); err != nil {
-			logger.Err(err).Msg(helpers.DecodeErr)
-			helpers.HandleError(w, r, helpers.DecodeErr)
-			return
-		}
-
-		js, jsErr := nc.JetStream(nats.PublishAsyncMaxPending(helpers.PublishAsyncMaxPendingConstant))
-		if jsErr != nil {
-			logger.Err(jsErr).Msg(helpers.NatsJetStreamError)
-			helpers.HandleError(w, r, helpers.NatsJetStreamError)
-			return
-		}
-
-		js.AddStream(&nats.StreamConfig{
-			Name:     "asset",
-			Subjects: []string{"query"},
-		})
 
 		request := helpers.AssetRichQueryRoutingVars{
 			ChannelID: channelIdFromRequest,
@@ -167,9 +139,9 @@ func RichQueryAsset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
 
-		var response []helpers.AssetMeta
+		var response helpers.AssetResultResponse
 		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 		if unmarshalErr != nil {
 			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
@@ -177,8 +149,12 @@ func RichQueryAsset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		render.JSON(w, r, response)
+		if response.Success {
+			render.JSON(w, r, response)
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+		}
 	} else {
-		render.Render(w, r, responses.ErrDoesNotExist(errors.New(helpers.InvalidRequest)))
+		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.InvalidRequest)))
 	}
 }

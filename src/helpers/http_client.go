@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"crypto/tls"
 	"crypto/x509"
-	"errors"
 	"io"
 	"net/http"
 	"os"
@@ -31,20 +30,11 @@ import (
 	"github.com/go-chi/render"
 )
 
-var log = GetLogger("HttpClient")
+var log = GetLogger(HttpClient)
 
 // Timeout for a HTTP Request to the agent.
 // Currently unenforced
 const timeout = 3
-
-// ErrNotFound is an error when an asset is not found
-var ErrNotFound = errors.New("not found")
-
-// ErrAlreadyExistsOnAgent is an error when a conflict occurs
-var ErrAlreadyExistsOnAgent = errors.New("conflict, already exists")
-
-// ErrUnauthorized is an error when the agent is unauthorized to perform this action
-var ErrUnauthorized = errors.New(" authenticated as is not authorized to perform this operation")
 
 // PostJSONRequest executes a POST request to a url with a Text/JSON body and optionally additional headers
 func PostJSONRequest(url string, body []byte) (resp *http.Response, err error) {
@@ -65,7 +55,7 @@ func PostJSONRequest(url string, body []byte) (resp *http.Response, err error) {
 	tlsConfig := &tls.Config{
 		Certificates:       []tls.Certificate{cert},
 		RootCAs:            caCertPool,
-		InsecureSkipVerify: false,
+		InsecureSkipVerify: true,
 	}
 
 	client := &http.Client{
@@ -89,12 +79,6 @@ func PostJSONRequest(url string, body []byte) (resp *http.Response, err error) {
 		return
 	}
 
-	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode == http.StatusConflict {
-			err = ErrAlreadyExistsOnAgent
-		}
-		return
-	}
 	return
 }
 
@@ -124,7 +108,7 @@ func GetRequest(url string) (result io.ReadCloser, err error) {
 	tlsConfig := &tls.Config{
 		Certificates:       []tls.Certificate{cert},
 		RootCAs:            caCertPool,
-		InsecureSkipVerify: false,
+		InsecureSkipVerify: true,
 	}
 
 	client := &http.Client{
@@ -142,12 +126,6 @@ func GetRequest(url string) (result io.ReadCloser, err error) {
 	}
 	result = resp.Body
 
-	if resp.StatusCode != http.StatusOK {
-		if resp.StatusCode == http.StatusNotFound {
-			err = ErrNotFound
-		}
-		return
-	}
 	return
 }
 

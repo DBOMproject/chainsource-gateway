@@ -24,8 +24,6 @@ import (
 	"github.com/go-chi/render"
 )
 
-// Assets
-
 // SuccessResponse is a type for a success response
 type SuccessResponse struct {
 	HTTPStatusCode int    `json:"-"`
@@ -48,65 +46,12 @@ func successfulResponse(code int, statusText string) render.Renderer {
 	}
 }
 
-/** Node **/
-// SuccessfulNodeInitResponse returns success when request is sent
-func SuccessfulNodeInitResponse() render.Renderer {
-	return successfulResponse(201, "Successfully sent request to initialize node")
+// SuccessfulCreateResponse
+func SuccessfulCreateResponse(status string) render.Renderer {
+	return successfulResponse(201, status)
 }
 
-/** Asset **/
-
-// SuccessfulAssetCreationResponse returns success when request is sent
-func SuccessfulAssetCreationResponse() render.Renderer {
-	return successfulResponse(201, "Successfully sent request to create asset")
-}
-
-// SuccessfulAssetUpdateResponse returns success when request is sent
-func SuccessfulAssetUpdateResponse() render.Renderer {
-	return successfulResponse(200, "Successfully sent request to update asset")
-}
-
-// SuccessfulLinkResponse returns success for when request is sent
-func SuccessfulLinkResponse() render.Renderer {
-	return successfulResponse(200, "Successfully sent request to link asset")
-}
-
-// SuccessfulUnlinkResponse returns success when request is sent
-func SuccessfulUnlinkResponse() render.Renderer {
-	return successfulResponse(200, "Successfully sent request to unlink asset")
-}
-
-/** Channels **/
-
-// SuccessfulChannelsCreationResponse returns success when request is sent
-func SuccessfulChannelsCreationResponse() render.Renderer {
-	return successfulResponse(201, "Successfully sent request to create channel")
-}
-
-// SuccessfulChannelUpdateResponse returns success when request is sent
-func SuccessfulChannelUpdateResponse() render.Renderer {
-	return successfulResponse(200, "Successfully sent request to update notary details to a channel")
-}
-
-// SuccessfulChannelUpdateResponse returns success when request is sent
-func SuccessfulChannelDeleteResponse() render.Renderer {
-	return successfulResponse(200, "Successfully sent request to delete notary details from a channel")
-}
-
-/** Federation **/
-
-// SuccessfulFederationSentResponse
-func SuccessfulFederationSentResponse() render.Renderer {
-	return successfulResponse(200, "Successfully sent federation request")
-}
-
-func SuccessfulFederationAcceptResponse() render.Renderer {
-	return successfulResponse(200, "Successfully accepted federation request")
-}
-func SuccessfulFederationRejectResponse() render.Renderer {
-	return successfulResponse(200, "Successfully rejected federation request")
-}
-
-func SuccessfulFederationRevokeResponse() render.Renderer {
-	return successfulResponse(200, "Successfully sent revoke request")
+// SuccessfulOkResponse
+func SuccessfulOkResponse(status string) render.Renderer {
+	return successfulResponse(200, status)
 }

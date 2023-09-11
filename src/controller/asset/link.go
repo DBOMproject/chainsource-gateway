@@ -58,18 +58,6 @@ func LinkAsset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		js, jsErr := nc.JetStream(nats.PublishAsyncMaxPending(helpers.PublishAsyncMaxPendingConstant))
-		if jsErr != nil {
-			logger.Err(jsErr).Msg(helpers.NatsJetStreamError)
-			helpers.HandleError(w, r, helpers.NatsJetStreamError)
-			return
-		}
-
-		js.AddStream(&nats.StreamConfig{
-			Name:     "asset",
-			Subjects: []string{"link"},
-		})
-
 		request := helpers.LinkAssetMeta{
 			ChannelID: channelIdFromRequest,
 			AssetID:   assetIdFromRequest,
@@ -84,15 +72,29 @@ func LinkAsset(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Send NATS request
-		js.PublishAsync("asset.link", requestMarshal)
+		msg, msgErr := nc.Request("asset.link", requestMarshal, helpers.TimeOut*time.Second)
+		if msgErr != nil {
+			logger.Err(msgErr).Msgf(helpers.MsgErr)
+			helpers.HandleError(w, r, helpers.MsgErr)
+			return
+		}
 
-		select {
-		case <-js.PublishAsyncComplete():
-			render.Render(w, r, responses.SuccessfulLinkResponse())
-		case <-time.After(helpers.TimeOut * time.Second):
-			helpers.HandleError(w, r, helpers.TimeOutErr)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
+
+		var response helpers.AssetResultResponse
+		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
+		if unmarshalErr != nil {
+			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
+			helpers.HandleError(w, r, helpers.UnmarshalErr)
+			return
+		}
+
+		if response.Success {
+			render.Render(w, r, responses.SuccessfulOkResponse(response.Status))
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
 		}
 	} else {
-		render.Render(w, r, responses.ErrDoesNotExist(errors.New(helpers.InvalidRequest)))
+		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.InvalidRequest)))
 	}
 }

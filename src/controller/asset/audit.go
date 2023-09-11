@@ -71,18 +71,21 @@ func AuditAsset(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
 
-		var response []helpers.HistoryMeta
+		var response helpers.HistoryResultResponse
 		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 		if unmarshalErr != nil {
 			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
 			helpers.HandleError(w, r, helpers.UnmarshalErr)
 			return
 		}
-
-		render.JSON(w, r, response)
+		if response.Success {
+			render.Render(w, r, responses.SuccessfulOkResponse(response.Status))
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+		}
 	} else {
-		render.Render(w, r, responses.ErrDoesNotExist(errors.New(helpers.InvalidRequest)))
+		render.Render(w, r, responses.ErrInvalidRequest(errors.New(helpers.InvalidRequest)))
 	}
 }

@@ -41,7 +41,7 @@ func Validate(w http.ResponseWriter, r *http.Request) bool {
 	nodeIdFromUri := strings.Split(chi.URLParam(r, "node_uri"), ".")[0]
 	channelFromUri := chi.URLParam(r, "channel_id")
 	nodeMetaData := node.GetNodeDetailsFromId(helpers.GetNodeID())
-	logger.Info().Msgf("Node _metadata from Asset: %v\n", nodeMetaData)
+	logger.Info().Msgf("Node metadata from Asset: %v\n", nodeMetaData)
 
 	for _, nodeConn := range nodeMetaData.NodeConnections {
 		if nodeConn.NodeId == nodeIdFromUri && nodeConn.Status == "FEDERATION_SUCCESS" {
@@ -65,8 +65,8 @@ func ListAssets(w http.ResponseWriter, r *http.Request) {
 	if nodeIdFromRequest == helpers.LocalNodeId || nodeIdFromRequest == helpers.GetNodeID() {
 		nc, ncErr := nats.Connect(os.Getenv("NATS_URI"))
 		if ncErr != nil {
-			logger.Err(ncErr).Msgf("NATS connection error")
-			helpers.HandleError(w, r, "NATS connection error")
+			logger.Err(ncErr).Msg(helpers.NatsConnectError)
+			helpers.HandleError(w, r, helpers.NatsConnectError)
 			return
 		}
 		defer nc.Close()
@@ -77,30 +77,34 @@ func ListAssets(w http.ResponseWriter, r *http.Request) {
 
 		requestMarshal, marshalErr := json.Marshal(request)
 		if marshalErr != nil {
-			logger.Err(marshalErr).Msgf("Request marshal error")
-			helpers.HandleError(w, r, "Request marshal error")
+			logger.Err(marshalErr).Msg(helpers.MarshalErr)
+			helpers.HandleError(w, r, helpers.MarshalErr)
 			return
 		}
 
 		// Send the request
 		msg, msgErr := nc.Request("asset.all", requestMarshal, helpers.TimeOut*time.Second)
 		if msgErr != nil {
-			logger.Err(msgErr).Msgf("NATS request error")
-			helpers.HandleError(w, r, "NATS request error")
+			logger.Err(msgErr).Msgf(helpers.MsgErr)
+			helpers.HandleError(w, r, helpers.MsgErr)
 			return
 		}
 
-		logger.Info().Msgf("Received response: %s\n", msg.Data)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
 
 		// Use the response
-		var response []helpers.AssetMeta
+		var response helpers.AssetResultResponse
 		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 		if unmarshalErr != nil {
 			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
-			helpers.HandleError(w, r, "Unmarshal error")
+			helpers.HandleError(w, r, helpers.UnmarshalErr)
 			return
 		}
-		render.JSON(w, r, response)
+		if response.Success {
+			render.JSON(w, r, response)
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+		}
 	} else {
 		logger.Info().Msgf("Request is not for this node, forwarding to %s", nodeUri)
 		if Validate(w, r) {
@@ -108,23 +112,27 @@ func ListAssets(w http.ResponseWriter, r *http.Request) {
 			res, err := helpers.GetRequest("https://" + host + "/api/v2/federation/requests/nodes/" + nodeUri + "/channels/" + channelIdFromRequest + "/assets")
 			if err != nil {
 				logger.Err(err).Msgf(helpers.ResponseErr)
-				helpers.HandleError(w, r, "Request error")
+				helpers.HandleError(w, r, helpers.ReadingErr)
 				return
 			}
 			data, err := io.ReadAll(res)
 			if err != nil {
 				http.Error(w, helpers.ReadingErr, http.StatusInternalServerError)
-				helpers.HandleError(w, r, "Reading error")
+				helpers.HandleError(w, r, helpers.ReadingErr)
 				return
 			}
-			var response []helpers.AssetMeta
+			var response helpers.AssetResultResponse
 			unmarshalErr := json.Unmarshal([]byte(string(data)), &response)
 			if unmarshalErr != nil {
 				logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
-				helpers.HandleError(w, r, "Unmarshal error")
+				helpers.HandleError(w, r, helpers.UnmarshalErr)
 				return
 			}
-			render.JSON(w, r, response)
+			if response.Success {
+				render.JSON(w, r, response)
+			} else {
+				render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+			}
 		} else {
 			render.Render(w, r, responses.ErrUnauthorizedQueryDestination(errors.New(helpers.Unauthorized)))
 		}
@@ -143,8 +151,8 @@ func ListOneAsset(w http.ResponseWriter, r *http.Request) {
 	if nodeIdFromRequest == helpers.LocalNodeId || nodeIdFromRequest == helpers.GetNodeID() {
 		nc, ncErr := nats.Connect(os.Getenv("NATS_URI"))
 		if ncErr != nil {
-			logger.Err(ncErr).Msgf(helpers.NatsConnectError)
-			helpers.HandleError(w, r, "NATS connection error")
+			logger.Err(ncErr).Msg(helpers.NatsConnectError)
+			helpers.HandleError(w, r, helpers.NatsConnectError)
 			return
 		}
 		defer nc.Close()
@@ -157,7 +165,7 @@ func ListOneAsset(w http.ResponseWriter, r *http.Request) {
 		requestMarshal, marshalErr := json.Marshal(request)
 		if marshalErr != nil {
 			logger.Err(marshalErr).Msgf(helpers.MarshalErr)
-			helpers.HandleError(w, r, "Marshal error")
+			helpers.HandleError(w, r, helpers.MarshalErr)
 			return
 		}
 
@@ -165,21 +173,25 @@ func ListOneAsset(w http.ResponseWriter, r *http.Request) {
 		msg, msgErr := nc.Request("asset.one", requestMarshal, helpers.TimeOut*time.Second)
 		if msgErr != nil {
 			logger.Err(msgErr).Msgf(helpers.MsgErr)
-			helpers.HandleError(w, r, "NATS request error")
+			helpers.HandleError(w, r, helpers.MsgErr)
 			return
 		}
 
-		logger.Info().Msgf(helpers.Success+"%s\n", msg.Data)
+		logger.Info().Msgf(helpers.Response+" %s\n", msg.Data)
 
 		// Use the response
-		var response []helpers.AssetMeta
+		var response helpers.AssetResultResponse
 		unmarshalErr := json.Unmarshal([]byte(string(msg.Data)), &response)
 		if unmarshalErr != nil {
 			logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
-			helpers.HandleError(w, r, "Unmarshal error")
+			helpers.HandleError(w, r, helpers.UnmarshalErr)
 			return
 		}
-		render.JSON(w, r, response)
+		if response.Success {
+			render.JSON(w, r, response)
+		} else {
+			render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+		}
 
 	} else {
 		if Validate(w, r) {
@@ -187,23 +199,27 @@ func ListOneAsset(w http.ResponseWriter, r *http.Request) {
 			res, err := helpers.GetRequest("https://" + host + "/api/v2/federation/requests/nodes/" + nodeUri + "/channels/" + channelIdFromRequest + "/assets/" + assetIdFromRequest)
 			if err != nil {
 				logger.Err(err).Msgf(helpers.ResponseErr)
-				helpers.HandleError(w, r, "Request error")
+				helpers.HandleError(w, r, helpers.ResponseErr)
 				return
 			}
 			data, err := io.ReadAll(res)
 			if err != nil {
 				http.Error(w, helpers.ReadingErr, http.StatusInternalServerError)
-				helpers.HandleError(w, r, "Reading error")
+				helpers.HandleError(w, r, helpers.ReadingErr)
 				return
 			}
-			var response []helpers.AssetMeta
+			var response helpers.AssetResultResponse
 			unmarshalErr := json.Unmarshal([]byte(string(data)), &response)
 			if unmarshalErr != nil {
 				logger.Err(unmarshalErr).Msgf(helpers.UnmarshalErr)
-				helpers.HandleError(w, r, "Unmarshal error")
+				helpers.HandleError(w, r, helpers.UnmarshalErr)
 				return
 			}
-			render.JSON(w, r, response)
+			if response.Success {
+				render.JSON(w, r, response)
+			} else {
+				render.Render(w, r, responses.ErrCustom(errors.New(response.Status)))
+			}
 		} else {
 			render.Render(w, r, responses.ErrUnauthorizedQueryDestination(errors.New(helpers.Unauthorized)))
 		}
